@@ -1,9 +1,16 @@
 ---
 title: Hello, World
-description: The very first post — why I started this blog and what it will look like.
+description: "Filed by the Federal Institute of Technical Standards: an engineering note from the earliest days of this site, setting out why it was opened, what it is built on and what comes next. One of the first engineering records registered with the Archives."
 pubDate: 2026-09-20
 tags: ['note', 'blog']
+category: techlog
+docNo: 'FT-0001-0011'
+issuedBy: 'Federal Institute of Technical Standards'
+classification: 'Internal circulation'
+stellarDate: 'Stellar Year 1, Ninth Month, Twentieth Day'
 ---
+
+> This is an engineering record, not a formal federal instrument. "I" is the author's own voice, kept exactly as written at the time of founding; the Archives registers it as found and does not rewrite it into official prose.
 
 Welcome to my blog.
 

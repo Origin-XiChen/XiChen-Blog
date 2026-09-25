@@ -4,7 +4,7 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { languages, useTranslations, type Lang } from '../i18n/ui';
 import { url } from '../lib/url';
-import { SITE } from '../config';
+import { SITE, FLAG_COLORS } from '../config';
 
 interface Props {
   lang: Lang;
@@ -21,8 +21,12 @@ const t = useTranslations(lang);
 
 const pageTitle = title ? `${title} · ${SITE.title}` : SITE.title;
 const pageDescription = description || t('site.description');
-const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin).href;
+const origin = Astro.site ?? new URL(Astro.url.origin);
+const canonical = new URL(Astro.url.pathname, origin).href;
+const ogImage = new URL(url(SITE.flag), origin).href;
 const switchUrl = langSwitchUrl ?? url(`${lang === 'zh' ? 'en' : 'zh'}/`);
+const ogLocale = lang === 'zh' ? 'zh_CN' : 'en_US';
+const ogLocaleAlt = lang === 'zh' ? 'en_US' : 'zh_CN';
 ---
 
 <!doctype html>
@@ -35,6 +39,7 @@ const switchUrl = langSwitchUrl ?? url(`${lang === 'zh' ? 'en' : 'zh'}/`);
     <meta name="author" content={SITE.author} />
     <meta name="generator" content={Astro.generator} />
     <link rel="icon" type="image/svg+xml" href={url('favicon.svg')} />
+    <link rel="apple-touch-icon" href={url(SITE.flag)} />
     <link rel="canonical" href={canonical} />
     {
       alternates.map((alternate) => (
@@ -51,11 +56,19 @@ const switchUrl = langSwitchUrl ?? url(`${lang === 'zh' ? 'en' : 'zh'}/`);
       title={`${SITE.title} · ${lang === 'zh' ? '中文' : 'English'}`}
       href={url(`${lang}/rss.xml`)}
     />
-    <meta name="theme-color" content={lang === 'zh' ? '#4f46e5' : '#4f46e5'} />
+    <meta name="theme-color" content={FLAG_COLORS.red} />
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE.title} />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={pageDescription} />
     <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:locale" content={ogLocale} />
+    <meta property="og:locale:alternate" content={ogLocaleAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={pageDescription} />
+    <meta name="twitter:image" content={ogImage} />
     <script is:inline>
       (() => {
         try {
@@ -69,7 +82,7 @@ const switchUrl = langSwitchUrl ?? url(`${lang === 'zh' ? 'en' : 'zh'}/`);
     </script>
   </head>
   <body>
-    <a class="skip-link" href="#main">Skip to content</a>
+    <a class="skip-link" href="#main">{t('a11y.skip')}</a>
     <Header lang={lang} langSwitchUrl={switchUrl} current={current} />
     <main id="main">
       <slot />

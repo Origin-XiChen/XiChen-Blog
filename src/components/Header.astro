@@ -1,6 +1,7 @@
 ---
 import { languages, useTranslations, type Lang } from '../i18n/ui';
 import { url } from '../lib/url';
+import FlagMark from './FlagMark.astro';
 
 interface Props {
   lang: Lang;
@@ -16,25 +17,19 @@ const otherLang: Lang = lang === 'zh' ? 'en' : 'zh';
 <header class="site-header">
   <div class="container site-header__inner">
     <a class="brand" href={url(`${lang}/`)}>
-      <svg class="brand__star" viewBox="0 0 24 24" aria-hidden="true">
-        <defs>
-          <linearGradient id="brandGradient" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#6366f1"></stop>
-            <stop offset="100%" stop-color="#06b6d4"></stop>
-          </linearGradient>
-        </defs>
-        <path
-          fill="url(#brandGradient)"
-          d="M12 2.4l2.94 6.02 6.62.92-4.81 4.66 1.16 6.6L12 17.48 6.09 20.6l1.16-6.6L2.44 9.34l6.62-.92z"
-        ></path>
-      </svg>
-      <span>{t('site.title')}</span>
+      <FlagMark class="brand__mark" title={t('site.title')} />
+      <span class="brand__text">
+        <span class="brand__name">{t('site.title')}</span>
+        <span class="brand__latin">{t('site.latinName')}</span>
+      </span>
     </a>
 
     <nav class="nav" aria-label="Navigation">
       <a href={url(`${lang}/`)} aria-current={current === 'home' ? 'page' : undefined}>
         {t('nav.home')}
       </a>
+      <a href={url(`${lang}/#documents`)} class="nav__section">{t('nav.documents')}</a>
+      <a href={url(`${lang}/#techlogs`)} class="nav__section">{t('nav.techlogs')}</a>
       <a href={url(`${lang}/about/`)} aria-current={current === 'about' ? 'page' : undefined}>
         {t('nav.about')}
       </a>
@@ -103,6 +98,33 @@ const otherLang: Lang = lang === 'zh' ? 'en' : 'zh';
 </script>
 
 <style>
+  :global(.brand__mark) {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+  }
+
+  .brand__text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.15;
+  }
+
+  .brand__name {
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+  }
+
+  .brand__latin {
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
   :root[data-theme='dark'] .icon--sun {
     display: none;
   }

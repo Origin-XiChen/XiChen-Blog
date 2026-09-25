@@ -1,0 +1,31 @@
+---
+/**
+ * 和星联邦国旗（矢量标记）
+ * 配色取自官方旗帜：绯红 #C10000、星蓝 #0070C1、鎏金 #FFCD00、素白 #FFFFFF
+ */
+interface Props {
+  class?: string;
+  /** 无障碍名称，默认使用联邦国名 */
+  title?: string;
+}
+
+const { class: className, title = '和星联邦' } = Astro.props;
+const clipId = `flagMark-${Math.random().toString(36).slice(2, 9)}`;
+---
+
+<svg class={className} viewBox="0 0 64 64" role="img" aria-label={title}>
+  <defs>
+    <clipPath id={clipId}>
+      <rect x="2" y="2" width="60" height="60" rx="13"></rect>
+    </clipPath>
+  </defs>
+  <g clip-path={`url(#${clipId})`}>
+    <rect x="2" y="2" width="30" height="60" fill="#C10000"></rect>
+    <rect x="32" y="2" width="30" height="60" fill="#0070C1"></rect>
+    <path
+      fill="#FFCD00"
+      d="M32 8L37.39 24.58L54.83 24.58L40.72 34.83L46.11 51.42L32 41.17L17.89 51.42L23.28 34.83L9.17 24.58L26.61 24.58Z"
+    ></path>
+    <circle cx="32" cy="32" r="7.4" fill="#FFFFFF"></circle>
+  </g>
+</svg>

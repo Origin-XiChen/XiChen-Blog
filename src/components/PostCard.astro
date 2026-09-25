@@ -10,13 +10,18 @@ interface Props {
 
 const { post, lang } = Astro.props;
 const t = useTranslations(lang);
-const { title, description, pubDate, tags } = post.data;
+const { title, description, pubDate, tags, category, docNo } = post.data;
 const minutes = readingTime(post.body, lang);
+const badgeLabel = t(`category.${category}`);
 ---
 
 <li>
   <a class="post-card" href={url(`${lang}/blog/${post.id}/`)}>
-    <h2 class="post-card__title">{title}</h2>
+    <div class="post-card__top">
+      <span class={`badge badge--${category}`}>{badgeLabel}</span>
+      {docNo && <span class="post-card__docno">{docNo}</span>}
+    </div>
+    <h3 class="post-card__title">{title}</h3>
     {description && <p class="post-card__desc">{description}</p>}
     <div class="meta">
       <time datetime={pubDate.toISOString()}>{formatDate(pubDate, lang)}</time>

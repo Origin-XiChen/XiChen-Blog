@@ -1,15 +1,22 @@
 /* ---------- 主题变量 ---------- */
 :root {
-  --bg: #f7f8fb;
+  /* 配色取自和星联邦国旗：红 #C10000 / 蓝 #0070C1 / 金 #FFCD00 */
+  --flag-red: #c10000;
+  --flag-blue: #0070c1;
+  --flag-gold: #ffcd00;
+  --flag-gold-ink: #8a6a00;
+
+  --bg: #f8f7f4;
   --bg-elevated: #ffffff;
-  --bg-subtle: #eef1f7;
+  --bg-subtle: #f1efe9;
   --text: #171b26;
   --text-muted: #5a637a;
-  --border: #e3e7f0;
-  --accent: #4f46e5;
-  --accent-2: #0891b2;
+  --border: #e4e1d9;
+  --accent: #b10000;
+  --accent-2: #0a6fb0;
+  --gold: #b98c00;
   --shadow: 0 1px 2px rgb(16 24 40 / 6%), 0 8px 24px -12px rgb(16 24 40 / 12%);
-  --code-bg: #f2f4f9;
+  --code-bg: #f2f1ec;
   --radius: 14px;
   --radius-sm: 9px;
   --max-width: 1080px;
@@ -26,8 +33,9 @@
   --text: #e7eaf3;
   --text-muted: #98a2b8;
   --border: #252c3d;
-  --accent: #8b93f8;
-  --accent-2: #22d3ee;
+  --accent: #ff7a7a;
+  --accent-2: #56b0ea;
+  --gold: #ffd84d;
   --shadow: 0 1px 2px rgb(0 0 0 / 40%), 0 12px 32px -16px rgb(0 0 0 / 60%);
   --code-bg: #1a202c;
 }
@@ -121,21 +129,16 @@ main {
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 0.55rem;
+  gap: 0.6rem;
+  min-width: 0;
   font-weight: 700;
-  font-size: 1.05rem;
+  font-size: 1.02rem;
   color: var(--text);
   letter-spacing: -0.01em;
 }
 
 .brand:hover {
   color: var(--accent);
-}
-
-.brand__star {
-  width: 22px;
-  height: 22px;
-  flex: none;
 }
 
 .nav {
@@ -573,7 +576,265 @@ main {
   color: var(--text-muted);
 }
 
+/* ---------- 馆头（旗帜 + 国名） ---------- */
+.masthead {
+  display: grid;
+  grid-template-columns: minmax(0, 340px) minmax(0, 1fr);
+  gap: 2.2rem;
+  align-items: center;
+  padding: 2.4rem 0 2.6rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2.6rem;
+}
+
+.masthead__flag {
+  display: block;
+  width: 100%;
+  border-radius: var(--radius-sm);
+  border: 1px solid color-mix(in srgb, var(--text) 14%, transparent);
+  box-shadow: var(--shadow);
+}
+
+.masthead__eyebrow {
+  margin: 0 0 0.5rem;
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--text-muted);
+}
+
+.masthead h1 {
+  margin: 0 0 0.55rem;
+  font-size: clamp(1.8rem, 3.6vw, 2.5rem);
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+}
+
+.masthead__motto {
+  margin: 0 0 0.9rem;
+  font-size: 1.05rem;
+  color: var(--flag-red);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+:root[data-theme='dark'] .masthead__motto {
+  color: var(--accent);
+}
+
+.masthead__desc {
+  margin: 0;
+  max-width: 48ch;
+  color: var(--text-muted);
+}
+
+/* ---------- 馆藏统计 ---------- */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.9rem;
+  margin: 0 0 2.8rem;
+  padding: 0;
+  list-style: none;
+}
+
+.stats li {
+  padding: 1rem 1.2rem;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--flag-red);
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
+}
+
+.stats li:nth-child(2) {
+  border-left-color: var(--flag-blue);
+}
+
+.stats li:nth-child(3) {
+  border-left-color: var(--gold);
+}
+
+.stats__value {
+  display: block;
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.stats__label {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+/* ---------- 栏目分组 ---------- */
+.section-block {
+  margin-bottom: 3rem;
+}
+
+.section-block__head {
+  margin-bottom: 1.2rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.section-block__head .section-title {
+  margin: 0 0 0.4rem;
+}
+
+.section-block__hint {
+  margin: 0.35rem 0 0;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+}
+
+/* ---------- 栏目徽标 ---------- */
+.badge {
+  display: inline-block;
+  padding: 0.1rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  line-height: 1.8;
+  border: 1px solid currentColor;
+}
+
+.badge--charter {
+  color: var(--flag-red);
+  background: color-mix(in srgb, var(--flag-red) 10%, transparent);
+}
+
+.badge--proclamation {
+  color: var(--accent-2);
+  background: color-mix(in srgb, var(--flag-blue) 10%, transparent);
+}
+
+.badge--resolution {
+  color: var(--gold);
+  background: color-mix(in srgb, var(--flag-gold) 14%, transparent);
+}
+
+.badge--techlog {
+  color: var(--text-muted);
+  background: var(--bg-subtle);
+  border-color: var(--border);
+}
+
+.post-card__top {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+}
+
+.post-card__docno {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  color: var(--text-muted);
+}
+
+/* ---------- 文献信息表 ---------- */
+.docinfo {
+  margin: 0 0 2rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-elevated);
+}
+
+.docinfo__title {
+  display: block;
+  margin-bottom: 0.6rem;
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+
+.docinfo dl {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.35rem 1.2rem;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.docinfo dt {
+  color: var(--text-muted);
+}
+
+.docinfo dd {
+  margin: 0;
+}
+
+/* ---------- 国旗释义 ---------- */
+.flag-figure {
+  margin: 0 0 1.6rem;
+}
+
+.flag-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-sm);
+  border: 1px solid color-mix(in srgb, var(--text) 14%, transparent);
+}
+
+.flag-figure figcaption {
+  margin-top: 0.6rem;
+  font-size: 0.84rem;
+  color: var(--text-muted);
+}
+
+.swatches {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.8rem;
+  margin: 1.2rem 0 1.8rem;
+  padding: 0;
+  list-style: none;
+}
+
+.swatches li {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
+  font-size: 0.88rem;
+}
+
+.swatches__chip {
+  width: 28px;
+  height: 28px;
+  flex: none;
+  border-radius: 7px;
+  border: 1px solid color-mix(in srgb, var(--text) 16%, transparent);
+}
+
+.swatches code {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
 /* ---------- 响应式 ---------- */
+@media (max-width: 900px) {
+  .masthead {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
+    text-align: left;
+  }
+
+  .masthead__flag {
+    max-width: 320px;
+  }
+}
+
 @media (max-width: 640px) {
   .site-header__inner {
     min-height: 56px;
@@ -583,12 +844,26 @@ main {
     display: none;
   }
 
+  .nav__section {
+    display: none !important;
+  }
+
   .hero {
     padding-top: 1.4rem;
   }
 
   .post-card {
     padding: 1.15rem 1.2rem;
+  }
+
+  .docinfo dl {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0 0;
+  }
+
+  .docinfo dt {
+    margin-top: 0.5rem;
+    font-size: 0.78rem;
   }
 }
 

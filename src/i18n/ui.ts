@@ -4,83 +4,132 @@ export const languages = {
 } as const;
 
 export type Lang = keyof typeof languages;
+
 export const langCodes: Lang[] = Object.keys(languages) as Lang[];
+
 export const defaultLang: Lang = 'zh';
 
 const zh = {
-  'site.title': "XiChen's Blog",
-  'site.description': '记录编程、人工智能与日常思考的个人博客。',
-  'site.author': 'XiChen',
+  'site.title': '和星联邦官方文献馆',
+  'site.description':
+    '和星联邦官方文献馆，收藏联邦宪章、政府公告、议会决议与技术日志，供世界观存档与查阅。',
+  'site.author': '和星联邦文献总署',
+  'site.motto': '以和为贵，众星共明',
+  'site.latinName': 'PeaceStar Federation',
 
-  'nav.home': '首页',
-  'nav.about': '关于',
-  'nav.rss': 'RSS',
+  'nav.home': '文献馆',
+  'nav.documents': '官方文献',
+  'nav.techlogs': '技术日志',
+  'nav.about': '关于本馆',
+  'nav.rss': 'RSS 订阅',
   'nav.theme': '切换主题',
   'nav.lang': 'English',
 
-  'home.latest': '最新文章',
-  'home.allPosts': '全部文章',
-  'home.readMore': '阅读全文',
-  'home.empty': '还没有文章，敬请期待。',
+  'home.latest': '最新发布',
+  'home.documents': '官方文献',
+  'home.documentsHint': '宪章、公告与决议，联邦的根本文书。',
+  'home.techlogs': '技术日志',
+  'home.techlogsHint': '联邦技术标准院归档的工程记录。',
+  'home.empty': '暂无文献，敬请期待。',
+  'home.stats.docs': '在册官方文献',
+  'home.stats.techlogs': '技术日志',
+  'home.stats.since': '星历元年建馆',
   'home.languageTitle': '选择语言',
   'home.languageHint': '正在根据你的浏览器语言自动跳转…',
+
+  'category.charter': '宪章',
+  'category.proclamation': '公告',
+  'category.resolution': '决议',
+  'category.techlog': '技术日志',
 
   'post.published': '发布于',
   'post.updated': '更新于',
   'post.minutes': '分钟阅读',
   'post.tags': '标签',
-  'post.backHome': '返回首页',
+  'post.backHome': '返回文献馆',
   'post.previous': '上一篇',
   'post.next': '下一篇',
-  'post.notTranslated': '该文章暂无其他语言版本',
+  'post.notTranslated': '该文献暂无其他语言版本',
+  'post.docInfo': '文献信息',
+  'post.docNo': '文献编号',
+  'post.issuedBy': '发布机关',
+  'post.classification': '密级',
+  'post.stellarDate': '星历日期',
 
-  'about.title': '关于',
-  'about.description': '关于这个博客和作者。',
+  'about.title': '关于本馆',
+  'about.description': '和星联邦官方文献馆概况、国旗释义与世界观设定说明。',
 
   '404.title': '页面走丢了',
   '404.description': '你访问的页面不存在或已被移动。',
-  '404.back': '回到首页',
+  '404.back': '回到文献馆',
 
-  'footer.builtWith': '使用 Astro 构建，由 GitHub Pages 托管',
+  'a11y.skip': '跳到正文',
+
+  'footer.builtWith': '本站为虚构世界观设定，由联邦文献总署维护',
+  'footer.disclaimer': '全部机构、文献与人物均属虚构，与现实无关。',
 } as const;
 
 export type UIKey = keyof typeof zh;
 
 const en: Record<UIKey, string> = {
-  'site.title': "XiChen's Blog",
-  'site.description': 'A personal blog about programming, AI and everyday thoughts.',
-  'site.author': 'XiChen',
+  'site.title': 'PeaceStar Federation Official Archives',
+  'site.description':
+    'The official archives of the PeaceStar Federation — charters, proclamations, resolutions and technical logs preserved for worldbuilding records.',
+  'site.author': 'Federal Archives Administration',
+  'site.motto': 'Peace Above All, Stars Shine Together',
+  'site.latinName': 'PeaceStar Federation',
 
-  'nav.home': 'Home',
+  'nav.home': 'Archives',
+  'nav.documents': 'Documents',
+  'nav.techlogs': 'Tech Logs',
   'nav.about': 'About',
-  'nav.rss': 'RSS',
+  'nav.rss': 'RSS feed',
   'nav.theme': 'Toggle theme',
   'nav.lang': '中文',
 
-  'home.latest': 'Latest posts',
-  'home.allPosts': 'All posts',
-  'home.readMore': 'Read more',
-  'home.empty': 'No posts yet. Stay tuned.',
+  'home.latest': 'Latest',
+  'home.documents': 'Official Documents',
+  'home.documentsHint': 'Charters, proclamations and resolutions — the founding papers.',
+  'home.techlogs': 'Technical Logs',
+  'home.techlogsHint': 'Engineering records filed by the Federal Institute of Technical Standards.',
+  'home.empty': 'No records yet. Stay tuned.',
+  'home.stats.docs': 'Documents on file',
+  'home.stats.techlogs': 'Technical logs',
+  'home.stats.since': 'Established Stellar Year 1',
   'home.languageTitle': 'Choose a language',
   'home.languageHint': 'Redirecting based on your browser language…',
+
+  'category.charter': 'Charter',
+  'category.proclamation': 'Proclamation',
+  'category.resolution': 'Resolution',
+  'category.techlog': 'Technical Log',
 
   'post.published': 'Published',
   'post.updated': 'Updated',
   'post.minutes': 'min read',
   'post.tags': 'Tags',
-  'post.backHome': 'Back to home',
+  'post.backHome': 'Back to the archives',
   'post.previous': 'Previous',
   'post.next': 'Next',
-  'post.notTranslated': 'This post is not available in another language yet',
+  'post.notTranslated': 'This record is not available in another language yet',
+  'post.docInfo': 'Document information',
+  'post.docNo': 'Document no.',
+  'post.issuedBy': 'Issued by',
+  'post.classification': 'Classification',
+  'post.stellarDate': 'Stellar date',
 
-  'about.title': 'About',
-  'about.description': 'About this blog and its author.',
+  'about.title': 'About the Archives',
+  'about.description':
+    'An overview of the PeaceStar Federation Archives, the national flag and the setting.',
 
   '404.title': 'Page not found',
   '404.description': 'The page you are looking for does not exist or has moved.',
-  '404.back': 'Back to home',
+  '404.back': 'Back to the archives',
 
-  'footer.builtWith': 'Built with Astro, hosted on GitHub Pages',
+  'a11y.skip': 'Skip to content',
+
+  'footer.builtWith': 'A fictional worldbuilding archive, maintained by the Federal Archives Administration',
+  'footer.disclaimer': 'All institutions, documents and persons are fictional.',
 };
 
 export const ui: Record<Lang, Record<UIKey, string>> = { zh, en };

@@ -1,10 +1,17 @@
 ---
 title: Building a Bilingual Blog with Astro
-description: From folder structure to automatic GitHub Pages deployment — how this blog was built.
+description: "Filed by the Federal Institute of Technical Standards: a complete procedure for this site, from folder structure and content collections to automatic GitHub Pages deployment. Usable as the technical basis for any comparable records site."
 pubDate: 2026-09-22
 updatedDate: 2026-09-23
 tags: ['astro', 'tutorial', 'blog']
+category: techlog
+docNo: 'FT-0001-0012'
+issuedBy: 'Federal Institute of Technical Standards'
+classification: 'Internal circulation'
+stellarDate: 'Stellar Year 1, Ninth Month, Twenty-Second Day'
 ---
+
+> This is an engineering record, not a formal federal instrument. Every step below has been carried out on this site; the commands and configuration can be reused as they stand.
 
 This post documents how this very blog is built, so you can follow along or, more likely, so future me can look it up.
 

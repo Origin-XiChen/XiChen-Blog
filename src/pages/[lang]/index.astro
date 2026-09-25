@@ -2,7 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PostCard from '../../components/PostCard.astro';
 import { langCodes, useTranslations, type Lang } from '../../i18n/ui';
-import { getPosts } from '../../lib/posts';
+import { getDocuments, getTechLogs } from '../../lib/posts';
 import { url } from '../../lib/url';
 import { SITE } from '../../config';
 
@@ -12,7 +12,8 @@ export function getStaticPaths() {
 
 const lang = Astro.params.lang as Lang;
 const t = useTranslations(lang);
-const posts = await getPosts(lang);
+const documents = await getDocuments(lang);
+const techlogs = await getTechLogs(lang);
 
 const other: Lang = lang === 'zh' ? 'en' : 'zh';
 const alternates = langCodes.map((code) => ({
@@ -31,17 +32,65 @@ const langSwitchUrl = url(`${other}/`);
   alternates={alternates}
 >
   <div class="container">
-    <section class="hero">
-      <h1>{SITE.title}</h1>
-      <p>{t('site.description')}</p>
+    <section class="masthead">
+      <img
+        class="masthead__flag"
+        src={url(SITE.flag)}
+        alt={lang === 'zh' ? '和星联邦国旗' : 'Flag of the PeaceStar Federation'}
+        width="604"
+        height="340"
+        loading="eager"
+      />
+      <div>
+        <p class="masthead__eyebrow">{SITE.latinName}</p>
+        <h1>{SITE.title}</h1>
+        <p class="masthead__motto">{t('site.motto')}</p>
+        <p class="masthead__desc">{t('site.description')}</p>
+      </div>
     </section>
 
-    <section aria-labelledby="latest-posts">
-      <h2 class="section-title" id="latest-posts">{t('home.latest')}</h2>
+    <ul class="stats">
+      <li>
+        <span class="stats__value">{documents.length}</span>
+        <span class="stats__label">{t('home.stats.docs')}</span>
+      </li>
+      <li>
+        <span class="stats__value">{techlogs.length}</span>
+        <span class="stats__label">{t('home.stats.techlogs')}</span>
+      </li>
+      <li>
+        <span class="stats__value">I</span>
+        <span class="stats__label">{t('home.stats.since')}</span>
+      </li>
+    </ul>
+
+    <section class="section-block" id="documents" aria-labelledby="documents-title">
+      <div class="section-block__head">
+        <h2 class="section-title" id="documents-title">{t('home.documents')}</h2>
+        <p class="section-block__hint">{t('home.documentsHint')}</p>
+      </div>
       {
-        posts.length > 0 ? (
+        documents.length > 0 ? (
           <ul class="post-list">
-            {posts.map((post) => (
+            {documents.map((post) => (
+              <PostCard post={post} lang={lang} />
+            ))}
+          </ul>
+        ) : (
+          <p>{t('home.empty')}</p>
+        )
+      }
+    </section>
+
+    <section class="section-block" id="techlogs" aria-labelledby="techlogs-title">
+      <div class="section-block__head">
+        <h2 class="section-title" id="techlogs-title">{t('home.techlogs')}</h2>
+        <p class="section-block__hint">{t('home.techlogsHint')}</p>
+      </div>
+      {
+        techlogs.length > 0 ? (
+          <ul class="post-list">
+            {techlogs.map((post) => (
               <PostCard post={post} lang={lang} />
             ))}
           </ul>

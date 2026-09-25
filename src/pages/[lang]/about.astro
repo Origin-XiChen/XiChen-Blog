@@ -2,7 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { langCodes, useTranslations, type Lang } from '../../i18n/ui';
 import { url } from '../../lib/url';
-import { SITE } from '../../config';
+import { SITE, FLAG_COLORS } from '../../config';
 
 export function getStaticPaths() {
   return langCodes.map((lang) => ({ params: { lang } }));
@@ -16,6 +16,29 @@ const alternates = langCodes.map((code) => ({
   lang: code,
   href: new URL(url(`${code}/about/`), Astro.site ?? Astro.url.origin).href,
 }));
+
+const swatches = [
+  {
+    hex: FLAG_COLORS.red,
+    zh: ['绯红', '联邦之土与不灭星火'],
+    en: ['Crimson', 'The federal land and the undying spark'],
+  },
+  {
+    hex: FLAG_COLORS.blue,
+    zh: ['星蓝', '苍穹与远航，联邦星域无垠'],
+    en: ['Star Blue', 'The sky and the long voyage across the federal stars'],
+  },
+  {
+    hex: FLAG_COLORS.gold,
+    zh: ['鎏金', '联邦之星，五域同心'],
+    en: ['Gilded Gold', 'The federal star, five domains of one heart'],
+  },
+  {
+    hex: FLAG_COLORS.white,
+    zh: ['素白', '和平之环与公道'],
+    en: ['Plain White', 'The ring of peace and equal justice'],
+  },
+];
 ---
 
 <BaseLayout
@@ -37,48 +60,179 @@ const alternates = langCodes.map((code) => ({
         lang === 'zh' ? (
           <>
             <p>
-              你好，我是 <strong>XiChen</strong>。这里是我的个人博客，用来记录我在编程、人工智能以及日常生活中的一些思考与总结。
+              <strong>和星联邦官方文献馆</strong>（{SITE.latinName}
+              ，以下简称本馆）为联邦最高文献保存与公开机构，负责收存、编号、校订并公开发布联邦的根本文书与技术记录。凡经本馆登录的文献，均视为联邦世界观设定中的一等官方存档，可径行引用。
             </p>
             <p>
-              我平时主要关注前端工程、AI 应用开发和工具链的效率问题。写博客对我来说是一种整理思路的方式——把学到的东西讲清楚，才算真正学会。
+              本馆所藏文字不对外界负责，只对历史负责。所有条文一经登录，除勘误外不再改写；若有后续修订，另发新号存档，旧号永久留痕。
             </p>
-            <h2>这个博客</h2>
+
+            <h2>建馆宗旨</h2>
             <p>
-              本站使用 <a href="https://astro.build" target="_blank" rel="noopener noreferrer">Astro</a> 构建，
-              托管在 GitHub Pages 上，支持中英文双语，整体是一套纯静态的站点，加载快、维护简单。
+              联邦以「{t('site.motto')}」为训。本馆设立之目的，在于使联邦的法度、决议与技艺有据可查、有号可循，使后世无需依赖口传即可复原联邦之本来面目。
             </p>
-            <h2>联系我</h2>
+
+            <h2>馆藏范围</h2>
+            <ul>
+              <li>
+                <strong>宪章</strong> —— 联邦建国的根本大法，确立联邦体制、星域疆界与公民基本权利。
+              </li>
+              <li>
+                <strong>公告</strong> —— 由联邦政府、元首或授权机关向全境发布的正式通告。
+              </li>
+              <li>
+                <strong>决议</strong> —— 联邦议会审议通过、具约束力的决议文书与附议记录。
+              </li>
+              <li>
+                <strong>技术日志</strong> —— 联邦技术标准院归档的工程记录、实验报告与标准草案。
+              </li>
+            </ul>
+
+            <h2>国旗释义</h2>
+            <figure class="flag-figure">
+              <img
+                src={url(SITE.flag)}
+                alt="和星联邦国旗"
+                width="604"
+                height="340"
+                loading="lazy"
+              />
+              <figcaption>
+                和星联邦国旗。纵向双色为底，中置金色五角星与白色和平之环，星历元年启用。
+              </figcaption>
+            </figure>
             <p>
-              如果你想交流，可以通过 GitHub 找到我。也欢迎订阅 <a href={url('zh/rss.xml')}>RSS</a> 获取更新。
+              旗面自左至右分作两色：左为绯红，右为星蓝，界线居中，象征联邦由两系文明合盟而立、其权均等。旗心为金色五角星，五星取五域同心之意；星心嵌素白圆环，环中画和平符号，昭示联邦以和平为立国之本，武力仅用于守土。
+            </p>
+            <ul class="swatches">
+              {swatches.map((item) => (
+                <li>
+                  <span class="swatches__chip" style={`background:${item.hex}`} aria-hidden="true" />
+                  <span>
+                    <strong>{lang === 'zh' ? item.zh[0] : item.en[0]}</strong>
+                    <br />
+                    <code>{item.hex.toUpperCase()}</code>
+                    <br />
+                    {lang === 'zh' ? item.zh[1] : item.en[1]}
+                  </span>
+                </li>
+              ))}
+            </ul>
+
+            <h2>文献编号</h2>
+            <p>
+              所有登录文献均附文献编号，格式为「机关代号-年份-序号」，例如
+              <code>FA-0001-0042</code>。编号一经编定即为唯一，不因修订、撤并或解密而更改。
+            </p>
+
+            <h2>引用与免责</h2>
+            <p>
+              本馆全部机构、文献、人物与事件均属虚构，仅为世界观存档与创作之用，与现实中任何国家、组织或个人无涉。欢迎引用、转载与二次设定，引用时请注明文献编号。
+            </p>
+            <p>
+              如需订阅本馆新登录文献，可使用 <a href={url('zh/rss.xml')}>RSS</a> 订阅。
             </p>
           </>
         ) : (
           <>
             <p>
-              Hi, I'm <strong>XiChen</strong>. This is my personal blog, where I write about
-              programming, artificial intelligence and everyday thoughts.
+              The <strong>PeaceStar Federation Official Archives</strong> is the Federation's
+              highest institution for the preservation and publication of records. It collects,
+              registers, revises and publishes the Federation's founding instruments and
+              engineering records. Any record registered here counts as a first-class official
+              archive within the setting and may be cited directly.
             </p>
             <p>
-              I mostly work on front-end engineering, AI-powered applications and developer
-              tooling. Writing is how I organize my thinking — if I can't explain it clearly,
-              I probably don't understand it yet.
+              These records answer to history rather than to any outside party. Once registered, a
+              text is never rewritten except for errata; later revisions are filed under a new
+              number, while the old number keeps its trace permanently.
             </p>
-            <h2>About this site</h2>
+
+            <h2>Purpose</h2>
             <p>
-              This site is built with <a href="https://astro.build" target="_blank" rel="noopener noreferrer">Astro</a>
-              and hosted on GitHub Pages. It is fully static, supports both Chinese and English,
-              and is fast to load and easy to maintain.
+              The Federation takes "{t('site.motto')}" as its creed. The Archives exist so that the
+              Federation's laws, resolutions and crafts remain verifiable and citable by number,
+              and so that later generations can reconstruct the Federation without relying on
+              hearsay.
             </p>
-            <h2>Get in touch</h2>
+
+            <h2>Holdings</h2>
+            <ul>
+              <li>
+                <strong>Charters</strong> — the founding law of the Federation, establishing its
+                system of government, its star territories and the basic rights of its citizens.
+              </li>
+              <li>
+                <strong>Proclamations</strong> — formal notices issued to the whole realm by the
+                government, the head of state or an authorised body.
+              </li>
+              <li>
+                <strong>Resolutions</strong> — binding instruments and supporting records adopted by
+                the Federal Assembly.
+              </li>
+              <li>
+                <strong>Technical logs</strong> — engineering records, experiment reports and draft
+                standards filed by the Federal Institute of Technical Standards.
+              </li>
+            </ul>
+
+            <h2>The national flag</h2>
+            <figure class="flag-figure">
+              <img
+                src={url(SITE.flag)}
+                alt="Flag of the PeaceStar Federation"
+                width="604"
+                height="340"
+                loading="lazy"
+              />
+              <figcaption>
+                The flag of the PeaceStar Federation: two vertical bands with a golden five-pointed
+                star and a white ring of peace at its heart. Adopted in Stellar Year 1.
+              </figcaption>
+            </figure>
             <p>
-              You can find me on GitHub. Feel free to subscribe to the <a href={url('en/rss.xml')}>RSS feed</a>
-              for updates.
+              The field is divided into two equal bands — crimson at the hoist, star blue at the
+              fly — signifying that the Federation was founded by the union of two civilisations
+              of equal standing. At its centre stands a golden five-pointed star, the five points
+              read as five domains of one heart. Set within the star is a plain white ring bearing
+              a peace symbol, declaring that peace is the Federation's foundation and that force is
+              kept only for the defence of the realm.
+            </p>
+            <ul class="swatches">
+              {swatches.map((item) => (
+                <li>
+                  <span class="swatches__chip" style={`background:${item.hex}`} aria-hidden="true" />
+                  <span>
+                    <strong>{lang === 'zh' ? item.zh[0] : item.en[0]}</strong>
+                    <br />
+                    <code>{item.hex.toUpperCase()}</code>
+                    <br />
+                    {lang === 'zh' ? item.zh[1] : item.en[1]}
+                  </span>
+                </li>
+              ))}
+            </ul>
+
+            <h2>File numbers</h2>
+            <p>
+              Every registered record carries a file number in the form
+              "agency code – year – serial", for example <code>FA-0001-0042</code>. A number is
+              unique once assigned and is never changed by revision, merger or declassification.
+            </p>
+
+            <h2>Citation and disclaimer</h2>
+            <p>
+              All institutions, documents, persons and events in these archives are fictional and
+              are kept for worldbuilding and creative use only. They bear no relation to any real
+              state, organisation or individual. Citation, republication and derivative settings
+              are welcome — please cite the file number.
+            </p>
+            <p>
+              To follow new registrations, subscribe via <a href={url('en/rss.xml')}>RSS</a>.
             </p>
           </>
         )
       }
     </div>
-
-    <p class="meta" style="margin-top: 2rem;">{SITE.title}</p>
   </div>
 </BaseLayout>

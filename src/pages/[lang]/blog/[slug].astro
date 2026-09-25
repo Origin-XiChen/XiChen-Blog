@@ -10,6 +10,7 @@ import {
   type Post,
 } from '../../../lib/posts';
 import { url } from '../../../lib/url';
+import { SITE } from '../../../config';
 
 export async function getStaticPaths() {
   const paths: {
@@ -37,6 +38,8 @@ const { Content, headings } = await render(post);
 
 const minutes = readingTime(post.body, lang);
 const toc = headings.filter((heading) => heading.depth === 2);
+const { category, docNo, issuedBy, classification, stellarDate } = post.data;
+const hasDocInfo = Boolean(docNo || issuedBy || classification || stellarDate);
 
 const translation = await getTranslation(lang, post.id);
 const other: Lang = lang === 'zh' ? 'en' : 'zh';
@@ -67,7 +70,8 @@ const jsonLd = {
   datePublished: post.data.pubDate.toISOString(),
   dateModified: (post.data.updatedDate ?? post.data.pubDate).toISOString(),
   inLanguage: lang === 'zh' ? 'zh-CN' : 'en',
-  author: { '@type': 'Person', name: 'XiChen' },
+  author: { '@type': 'Organization', name: SITE.author },
+  publisher: { '@type': 'Organization', name: SITE.author },
   mainEntityOfPage: new URL(
     url(`${lang}/blog/${post.id}/`),
     Astro.site ?? Astro.url.origin,
@@ -88,6 +92,7 @@ const jsonLd = {
 
     <article class="article">
       <header class="article__header">
+        <span class={`badge badge--${category}`}>{t(`category.${category}`)}</span>
         <h1 class="article__title">{post.data.title}</h1>
         <div class="article__meta">
           <time datetime={post.data.pubDate.toISOString()}>
@@ -112,6 +117,40 @@ const jsonLd = {
           )
         }
       </header>
+
+      {
+        hasDocInfo && (
+          <section class="docinfo" aria-label={t('post.docInfo')}>
+            <strong class="docinfo__title">{t('post.docInfo')}</strong>
+            <dl>
+              {docNo && (
+                <>
+                  <dt>{t('post.docNo')}</dt>
+                  <dd>{docNo}</dd>
+                </>
+              )}
+              {issuedBy && (
+                <>
+                  <dt>{t('post.issuedBy')}</dt>
+                  <dd>{issuedBy}</dd>
+                </>
+              )}
+              {classification && (
+                <>
+                  <dt>{t('post.classification')}</dt>
+                  <dd>{classification}</dd>
+                </>
+              )}
+              {stellarDate && (
+                <>
+                  <dt>{t('post.stellarDate')}</dt>
+                  <dd>{stellarDate}</dd>
+                </>
+              )}
+            </dl>
+          </section>
+        )
+      }
 
       {
         toc.length > 2 && (
@@ -166,6 +205,10 @@ const jsonLd = {
   <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 
   <style>
+    .article__header .badge {
+      margin-bottom: 0.7rem;
+    }
+
     .toc {
       margin: 0 0 2rem;
       padding: 1rem 1.25rem;
