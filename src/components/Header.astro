@@ -1,0 +1,113 @@
+---
+import { languages, useTranslations, type Lang } from '../i18n/ui';
+import { url } from '../lib/url';
+
+interface Props {
+  lang: Lang;
+  langSwitchUrl: string;
+  current?: 'home' | 'about' | 'post';
+}
+
+const { lang, langSwitchUrl, current } = Astro.props;
+const t = useTranslations(lang);
+const otherLang: Lang = lang === 'zh' ? 'en' : 'zh';
+---
+
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a class="brand" href={url(`${lang}/`)}>
+      <svg class="brand__star" viewBox="0 0 24 24" aria-hidden="true">
+        <defs>
+          <linearGradient id="brandGradient" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#6366f1"></stop>
+            <stop offset="100%" stop-color="#06b6d4"></stop>
+          </linearGradient>
+        </defs>
+        <path
+          fill="url(#brandGradient)"
+          d="M12 2.4l2.94 6.02 6.62.92-4.81 4.66 1.16 6.6L12 17.48 6.09 20.6l1.16-6.6L2.44 9.34l6.62-.92z"
+        ></path>
+      </svg>
+      <span>{t('site.title')}</span>
+    </a>
+
+    <nav class="nav" aria-label="Navigation">
+      <a href={url(`${lang}/`)} aria-current={current === 'home' ? 'page' : undefined}>
+        {t('nav.home')}
+      </a>
+      <a href={url(`${lang}/about/`)} aria-current={current === 'about' ? 'page' : undefined}>
+        {t('nav.about')}
+      </a>
+      <a
+        class="icon-button"
+        href={url(`${lang}/rss.xml`)}
+        aria-label={t('nav.rss')}
+        title={t('nav.rss')}
+      >
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <path d="M4 11a9 9 0 019 9"></path>
+          <path d="M4 4a16 16 0 0116 16"></path>
+          <circle cx="5" cy="19" r="1.6" fill="currentColor" stroke="none"></circle>
+        </svg>
+      </a>
+      <a
+        class="icon-button"
+        href={langSwitchUrl}
+        data-lang={otherLang}
+        data-lang-switch
+        aria-label={languages[otherLang].label}
+        title={languages[otherLang].label}
+      >
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <circle cx="12" cy="12" r="9"></circle>
+          <path d="M3.6 9h16.8M3.6 15h16.8"></path>
+          <path d="M12 3a15 15 0 010 18 15 15 0 010-18z"></path>
+        </svg>
+      </a>
+      <button id="theme-toggle" class="icon-button" type="button" aria-label={t('nav.theme')} title={t('nav.theme')}>
+        <svg class="icon icon--sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <circle cx="12" cy="12" r="4.2"></circle>
+          <path d="M12 2.5v2.2M12 19.3v2.2M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.9 19.1l1.6-1.6M17.5 6.5l1.6-1.6"></path>
+        </svg>
+        <svg class="icon icon--moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <path d="M20 14.2A8.2 8.2 0 019.8 4 8.4 8.4 0 1020 14.2z"></path>
+        </svg>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<script is:inline>
+  (() => {
+    const root = document.documentElement;
+
+    document.addEventListener('click', (event) => {
+      const toggle = event.target.closest('#theme-toggle');
+      if (toggle) {
+        const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+        root.dataset.theme = next;
+        try {
+          localStorage.setItem('theme', next);
+        } catch (error) {}
+        return;
+      }
+
+      const langLink = event.target.closest('[data-lang-switch]');
+      if (langLink) {
+        try {
+          localStorage.setItem('lang', langLink.getAttribute('data-lang'));
+        } catch (error) {}
+      }
+    });
+  })();
+</script>
+
+<style>
+  :root[data-theme='dark'] .icon--sun {
+    display: none;
+  }
+
+  :root:not([data-theme='dark']) .icon--moon {
+    display: none;
+  }
+</style>

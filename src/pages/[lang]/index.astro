@@ -1,0 +1,54 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import { langCodes, useTranslations, type Lang } from '../../i18n/ui';
+import { getPosts } from '../../lib/posts';
+import { url } from '../../lib/url';
+import { SITE } from '../../config';
+
+export function getStaticPaths() {
+  return langCodes.map((lang) => ({ params: { lang } }));
+}
+
+const lang = Astro.params.lang as Lang;
+const t = useTranslations(lang);
+const posts = await getPosts(lang);
+
+const other: Lang = lang === 'zh' ? 'en' : 'zh';
+const alternates = langCodes.map((code) => ({
+  lang: code,
+  href: new URL(url(`${code}/`), Astro.site ?? Astro.url.origin).href,
+}));
+
+const langSwitchUrl = url(`${other}/`);
+---
+
+<BaseLayout
+  lang={lang}
+  description={t('site.description')}
+  current="home"
+  langSwitchUrl={langSwitchUrl}
+  alternates={alternates}
+>
+  <div class="container">
+    <section class="hero">
+      <h1>{SITE.title}</h1>
+      <p>{t('site.description')}</p>
+    </section>
+
+    <section aria-labelledby="latest-posts">
+      <h2 class="section-title" id="latest-posts">{t('home.latest')}</h2>
+      {
+        posts.length > 0 ? (
+          <ul class="post-list">
+            {posts.map((post) => (
+              <PostCard post={post} lang={lang} />
+            ))}
+          </ul>
+        ) : (
+          <p>{t('home.empty')}</p>
+        )
+      }
+    </section>
+  </div>
+</BaseLayout>

@@ -1,0 +1,19 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { useTranslations } from '../i18n/ui';
+import { url } from '../lib/url';
+
+const t = useTranslations('zh');
+---
+
+<BaseLayout lang="zh" title={t('404.title')} description={t('404.description')}>
+  <div class="container center-page">
+    <h1>404</h1>
+    <h2>{t('404.title')}</h2>
+    <p>{t('404.description')}</p>
+    <div class="lang-links">
+      <a href={url('zh/')}>中文首页</a>
+      <a href={url('en/')}>English Home</a>
+    </div>
+  </div>
+</BaseLayout>

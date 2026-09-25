@@ -1,0 +1,202 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { langCodes, useTranslations, type Lang } from '../../../i18n/ui';
+import {
+  formatDate,
+  getPosts,
+  getTranslation,
+  readingTime,
+  type Post,
+} from '../../../lib/posts';
+import { url } from '../../../lib/url';
+
+export async function getStaticPaths() {
+  const paths: {
+    params: { lang: string; slug: string };
+    props: { post: Post; prev?: Post; next?: Post };
+  }[] = [];
+
+  for (const lang of langCodes) {
+    const posts = await getPosts(lang);
+    posts.forEach((post, index) => {
+      paths.push({
+        params: { lang, slug: post.id },
+        props: { post, prev: posts[index + 1], next: posts[index - 1] },
+      });
+    });
+  }
+
+  return paths;
+}
+
+const { post, prev, next } = Astro.props as { post: Post; prev?: Post; next?: Post };
+const lang = Astro.params.lang as Lang;
+const t = useTranslations(lang);
+const { Content, headings } = await render(post);
+
+const minutes = readingTime(post.body, lang);
+const toc = headings.filter((heading) => heading.depth === 2);
+
+const translation = await getTranslation(lang, post.id);
+const other: Lang = lang === 'zh' ? 'en' : 'zh';
+const langSwitchUrl = translation
+  ? url(`${other}/blog/${translation.id}/`)
+  : url(`${other}/`);
+
+const alternates = [
+  { lang, href: new URL(url(`${lang}/blog/${post.id}/`), Astro.site ?? Astro.url.origin).href },
+  ...(translation
+    ? [
+        {
+          lang: other,
+          href: new URL(
+            url(`${other}/blog/${translation.id}/`),
+            Astro.site ?? Astro.url.origin,
+          ).href,
+        },
+      ]
+    : []),
+];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: post.data.title,
+  description: post.data.description,
+  datePublished: post.data.pubDate.toISOString(),
+  dateModified: (post.data.updatedDate ?? post.data.pubDate).toISOString(),
+  inLanguage: lang === 'zh' ? 'zh-CN' : 'en',
+  author: { '@type': 'Person', name: 'XiChen' },
+  mainEntityOfPage: new URL(
+    url(`${lang}/blog/${post.id}/`),
+    Astro.site ?? Astro.url.origin,
+  ).href,
+};
+---
+
+<BaseLayout
+  lang={lang}
+  title={post.data.title}
+  description={post.data.description || t('site.description')}
+  current="post"
+  langSwitchUrl={langSwitchUrl}
+  alternates={alternates}
+>
+  <div class="container container--narrow">
+    <a class="back-link" href={url(`${lang}/`)}>← {t('post.backHome')}</a>
+
+    <article class="article">
+      <header class="article__header">
+        <h1 class="article__title">{post.data.title}</h1>
+        <div class="article__meta">
+          <time datetime={post.data.pubDate.toISOString()}>
+            {t('post.published')} {formatDate(post.data.pubDate, lang)}
+          </time>
+          {
+            post.data.updatedDate && (
+              <span class="meta__dot">
+                {t('post.updated')} {formatDate(post.data.updatedDate, lang)}
+              </span>
+            )
+          }
+          <span class="meta__dot">{minutes} {t('post.minutes')}</span>
+        </div>
+        {
+          post.data.tags.length > 0 && (
+            <ul class="tags">
+              {post.data.tags.map((tag) => (
+                <li class="tag">#{tag}</li>
+              ))}
+            </ul>
+          )
+        }
+      </header>
+
+      {
+        toc.length > 2 && (
+          <nav class="toc" aria-label="Table of contents">
+            <span class="toc__title">{lang === 'zh' ? '目录' : 'On this page'}</span>
+            <ol>
+              {toc.map((heading) => (
+                <li>
+                  <a href={`#${heading.slug}`}>{heading.text}</a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        )
+      }
+
+      <div class="prose">
+        <Content />
+      </div>
+
+      {
+        !translation && (
+          <p class="translation-note">{t('post.notTranslated')}</p>
+        )
+      }
+
+      {
+        (prev || next) && (
+          <nav class="post-nav" aria-label="Post navigation">
+            {prev ? (
+              <a href={url(`${lang}/blog/${prev.id}/`)}>
+                <span class="post-nav__label">← {t('post.previous')}</span>
+                <span class="post-nav__title">{prev.data.title}</span>
+              </a>
+            ) : (
+              <span />
+            )}
+            {next ? (
+              <a class="post-nav--next" href={url(`${lang}/blog/${next.id}/`)}>
+                <span class="post-nav__label">{t('post.next')} →</span>
+                <span class="post-nav__title">{next.data.title}</span>
+              </a>
+            ) : (
+              <span />
+            )}
+          </nav>
+        )
+      }
+    </article>
+  </div>
+
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+  <style>
+    .toc {
+      margin: 0 0 2rem;
+      padding: 1rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--bg-elevated);
+      font-size: 0.92rem;
+    }
+
+    .toc__title {
+      display: block;
+      margin-bottom: 0.4rem;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+    }
+
+    .toc ol {
+      margin: 0;
+      padding-left: 1.1rem;
+    }
+
+    .toc li {
+      margin: 0.2rem 0;
+    }
+
+    .translation-note {
+      margin-top: 2rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+  </style>
+</BaseLayout>

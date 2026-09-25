@@ -1,0 +1,84 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { langCodes, useTranslations, type Lang } from '../../i18n/ui';
+import { url } from '../../lib/url';
+import { SITE } from '../../config';
+
+export function getStaticPaths() {
+  return langCodes.map((lang) => ({ params: { lang } }));
+}
+
+const lang = Astro.params.lang as Lang;
+const t = useTranslations(lang);
+const other: Lang = lang === 'zh' ? 'en' : 'zh';
+
+const alternates = langCodes.map((code) => ({
+  lang: code,
+  href: new URL(url(`${code}/about/`), Astro.site ?? Astro.url.origin).href,
+}));
+---
+
+<BaseLayout
+  lang={lang}
+  title={t('about.title')}
+  description={t('about.description')}
+  current="about"
+  langSwitchUrl={url(`${other}/about/`)}
+  alternates={alternates}
+>
+  <div class="container container--narrow">
+    <header class="page-header">
+      <h1>{t('about.title')}</h1>
+      <p>{t('about.description')}</p>
+    </header>
+
+    <div class="prose">
+      {
+        lang === 'zh' ? (
+          <>
+            <p>
+              你好，我是 <strong>XiChen</strong>。这里是我的个人博客，用来记录我在编程、人工智能以及日常生活中的一些思考与总结。
+            </p>
+            <p>
+              我平时主要关注前端工程、AI 应用开发和工具链的效率问题。写博客对我来说是一种整理思路的方式——把学到的东西讲清楚，才算真正学会。
+            </p>
+            <h2>这个博客</h2>
+            <p>
+              本站使用 <a href="https://astro.build" target="_blank" rel="noopener noreferrer">Astro</a> 构建，
+              托管在 GitHub Pages 上，支持中英文双语，整体是一套纯静态的站点，加载快、维护简单。
+            </p>
+            <h2>联系我</h2>
+            <p>
+              如果你想交流，可以通过 GitHub 找到我。也欢迎订阅 <a href={url('zh/rss.xml')}>RSS</a> 获取更新。
+            </p>
+          </>
+        ) : (
+          <>
+            <p>
+              Hi, I'm <strong>XiChen</strong>. This is my personal blog, where I write about
+              programming, artificial intelligence and everyday thoughts.
+            </p>
+            <p>
+              I mostly work on front-end engineering, AI-powered applications and developer
+              tooling. Writing is how I organize my thinking — if I can't explain it clearly,
+              I probably don't understand it yet.
+            </p>
+            <h2>About this site</h2>
+            <p>
+              This site is built with <a href="https://astro.build" target="_blank" rel="noopener noreferrer">Astro</a>
+              and hosted on GitHub Pages. It is fully static, supports both Chinese and English,
+              and is fast to load and easy to maintain.
+            </p>
+            <h2>Get in touch</h2>
+            <p>
+              You can find me on GitHub. Feel free to subscribe to the <a href={url('en/rss.xml')}>RSS feed</a>
+              for updates.
+            </p>
+          </>
+        )
+      }
+    </div>
+
+    <p class="meta" style="margin-top: 2rem;">{SITE.title}</p>
+  </div>
+</BaseLayout>

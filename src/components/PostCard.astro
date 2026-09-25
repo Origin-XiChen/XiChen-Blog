@@ -1,0 +1,35 @@
+---
+import { useTranslations, type Lang } from '../i18n/ui';
+import { formatDate, readingTime, type Post } from '../lib/posts';
+import { url } from '../lib/url';
+
+interface Props {
+  post: Post;
+  lang: Lang;
+}
+
+const { post, lang } = Astro.props;
+const t = useTranslations(lang);
+const { title, description, pubDate, tags } = post.data;
+const minutes = readingTime(post.body, lang);
+---
+
+<li>
+  <a class="post-card" href={url(`${lang}/blog/${post.id}/`)}>
+    <h2 class="post-card__title">{title}</h2>
+    {description && <p class="post-card__desc">{description}</p>}
+    <div class="meta">
+      <time datetime={pubDate.toISOString()}>{formatDate(pubDate, lang)}</time>
+      <span class="meta__dot">{minutes} {t('post.minutes')}</span>
+      {
+        tags.length > 0 && (
+          <ul class="tags">
+            {tags.map((tag) => (
+              <li class="tag">#{tag}</li>
+            ))}
+          </ul>
+        )
+      }
+    </div>
+  </a>
+</li>

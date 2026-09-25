@@ -1,0 +1,56 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { languages, langCodes, useTranslations } from '../i18n/ui';
+import { url } from '../lib/url';
+
+const t = useTranslations('zh');
+const targets = Object.fromEntries(langCodes.map((lang) => [lang, url(`${lang}/`)]));
+
+const alternates = langCodes.map((lang) => ({
+  lang,
+  href: new URL(url(`${lang}/`), Astro.site ?? Astro.url.origin).href,
+}));
+---
+
+<BaseLayout
+  lang="zh"
+  title={t('home.languageTitle')}
+  description={t('site.description')}
+  langSwitchUrl={url('en/')}
+  alternates={alternates}
+>
+  <div class="container center-page">
+    <h1>{t('home.languageTitle')}</h1>
+    <p>{t('home.languageHint')}</p>
+    <div class="lang-links">
+      {
+        langCodes.map((lang) => (
+          <a href={url(`${lang}/`)} hreflang={languages[lang].htmlLang} lang={languages[lang].htmlLang}>
+            {languages[lang].label}
+          </a>
+        ))
+      }
+    </div>
+  </div>
+
+  <script is:inline define:vars={{ targets }}>
+    (() => {
+      let preferred = null;
+      try {
+        preferred = localStorage.getItem('lang');
+      } catch (error) {}
+
+      if (preferred && targets[preferred]) {
+        window.location.replace(targets[preferred]);
+        return;
+      }
+
+      const languages = navigator.languages && navigator.languages.length
+        ? navigator.languages
+        : [navigator.language || ''];
+      const picked = languages.some((item) => item.toLowerCase().startsWith('zh')) ? 'zh' : 'en';
+
+      window.setTimeout(() => window.location.replace(targets[picked]), 350);
+    })();
+  </script>
+</BaseLayout>

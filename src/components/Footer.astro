@@ -1,0 +1,19 @@
+---
+import { useTranslations, type Lang } from '../i18n/ui';
+import { SITE } from '../config';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container site-footer__inner">
+    <span>© {year} {SITE.author}</span>
+    <span>{t('footer.builtWith')}</span>
+  </div>
+</footer>
