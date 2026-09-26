@@ -92,7 +92,10 @@ const jsonLd = {
 
     <article class="article">
       <header class="article__header">
-        <span class={`badge badge--${category}`}>{t(`category.${category}`)}</span>
+        <div class="article__kicker">
+          <span class={`badge badge--${category}`}>{t(`category.${category}`)}</span>
+          {docNo && <span class="docno">{docNo}</span>}
+        </div>
         <h1 class="article__title">{post.data.title}</h1>
         <div class="article__meta">
           <time datetime={post.data.pubDate.toISOString()}>
@@ -100,16 +103,16 @@ const jsonLd = {
           </time>
           {
             post.data.updatedDate && (
-              <span class="meta__dot">
+              <span>
                 {t('post.updated')} {formatDate(post.data.updatedDate, lang)}
               </span>
             )
           }
-          <span class="meta__dot">{minutes} {t('post.minutes')}</span>
+          <span>{minutes} {t('post.minutes')}</span>
         </div>
         {
           post.data.tags.length > 0 && (
-            <ul class="tags">
+            <ul class="tags article__tags">
               {post.data.tags.map((tag) => (
                 <li class="tag">#{tag}</li>
               ))}
@@ -203,43 +206,4 @@ const jsonLd = {
   </div>
 
   <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
-
-  <style>
-    .article__header .badge {
-      margin-bottom: 0.7rem;
-    }
-
-    .toc {
-      margin: 0 0 2rem;
-      padding: 1rem 1.25rem;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      background: var(--bg-elevated);
-      font-size: 0.92rem;
-    }
-
-    .toc__title {
-      display: block;
-      margin-bottom: 0.4rem;
-      font-size: 0.78rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--text-muted);
-    }
-
-    .toc ol {
-      margin: 0;
-      padding-left: 1.1rem;
-    }
-
-    .toc li {
-      margin: 0.2rem 0;
-    }
-
-    .translation-note {
-      margin-top: 2rem;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-    }
-  </style>
 </BaseLayout>

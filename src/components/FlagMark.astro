@@ -1,31 +1,39 @@
 ---
 /**
- * 和星联邦国旗（矢量标记）
- * 配色取自官方旗帜：绯红 #C10000、星蓝 #0070C1、鎏金 #FFCD00、素白 #FFFFFF
+ * 旗帜标记（矢量）
+ *
+ * 制式与纹章均取自 src/lib/flags.ts，与 public/flags/*.svg 同源：
+ * 纵向双色旗面、中置鎏金五角星、星心嵌素白圆盘，盘上绘本旗纹章。
  */
+import { FEDERAL_FLAG, FLAG, flagBody } from '../lib/flags';
+import type { Domain } from '../config';
+
 interface Props {
   class?: string;
-  /** 无障碍名称，默认使用联邦国名 */
+  /** 无障碍名称；缺省时按旗主自动生成 */
   title?: string;
+  /** 传入州域则绘该域域旗，否则绘联邦国旗 */
+  domain?: Domain;
+  /** 是否渲染无障碍名称，纯装饰处可置 false */
+  decorative?: boolean;
 }
 
-const { class: className, title = '和星联邦' } = Astro.props;
-const clipId = `flagMark-${Math.random().toString(36).slice(2, 9)}`;
+const { class: className, title, domain, decorative = false } = Astro.props;
+
+const flag = domain
+  ? { hoist: domain.colors[0], fly: domain.colors[1], emblem: domain.emblem }
+  : { hoist: FEDERAL_FLAG.hoist, fly: FEDERAL_FLAG.fly, emblem: FEDERAL_FLAG.emblem };
+
+const label = title ?? (domain ? `${domain.name.zh}域旗` : '和星联邦国旗');
+
+const body = flagBody(flag);
 ---
 
-<svg class={className} viewBox="0 0 64 64" role="img" aria-label={title}>
-  <defs>
-    <clipPath id={clipId}>
-      <rect x="2" y="2" width="60" height="60" rx="13"></rect>
-    </clipPath>
-  </defs>
-  <g clip-path={`url(#${clipId})`}>
-    <rect x="2" y="2" width="30" height="60" fill="#C10000"></rect>
-    <rect x="32" y="2" width="30" height="60" fill="#0070C1"></rect>
-    <path
-      fill="#FFCD00"
-      d="M32 8L37.39 24.58L54.83 24.58L40.72 34.83L46.11 51.42L32 41.17L17.89 51.42L23.28 34.83L9.17 24.58L26.61 24.58Z"
-    ></path>
-    <circle cx="32" cy="32" r="7.4" fill="#FFFFFF"></circle>
-  </g>
-</svg>
+<svg
+  class={className}
+  viewBox={`0 0 ${FLAG.width} ${FLAG.height}`}
+  role={decorative ? 'presentation' : 'img'}
+  aria-label={decorative ? undefined : label}
+  aria-hidden={decorative ? 'true' : undefined}
+  preserveAspectRatio="xMidYMid meet"
+><Fragment set:html={body} /></svg>

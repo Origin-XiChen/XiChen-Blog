@@ -1,8 +1,9 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import FlagMark from '../../components/FlagMark.astro';
 import { langCodes, useTranslations, type Lang } from '../../i18n/ui';
 import { url } from '../../lib/url';
-import { SITE, FLAG_COLORS } from '../../config';
+import { SITE, FLAG_COLORS, DOMAINS } from '../../config';
 
 export function getStaticPaths() {
   return langCodes.map((lang) => ({ params: { lang } }));
@@ -11,6 +12,9 @@ export function getStaticPaths() {
 const lang = Astro.params.lang as Lang;
 const t = useTranslations(lang);
 const other: Lang = lang === 'zh' ? 'en' : 'zh';
+
+const ORDINALS = { zh: ['一', '二', '三', '四', '五'], en: ['I', 'II', 'III', 'IV', 'V'] } as const;
+const ordinal = (n: number) => ORDINALS[lang][n - 1] ?? String(n);
 
 const alternates = langCodes.map((code) => ({
   lang: code,
@@ -51,6 +55,9 @@ const swatches = [
 >
   <div class="container container--narrow">
     <header class="page-header">
+      <p class="page-header__kicker">
+        {lang === 'zh' ? '和星联邦　·　官方文献存档' : 'PEACESTAR FEDERATION · OFFICIAL ARCHIVE'}
+      </p>
       <h1>{t('about.title')}</h1>
       <p>{t('about.description')}</p>
     </header>
@@ -93,16 +100,16 @@ const swatches = [
               <img
                 src={url(SITE.flag)}
                 alt="和星联邦国旗"
-                width="604"
-                height="340"
+                width="1208"
+                height="680"
                 loading="lazy"
               />
               <figcaption>
-                和星联邦国旗。纵向双色为底，中置金色五角星与白色和平之环，星历元年启用。
+                和星联邦国旗：纵向双色为底，中置金色五角星，星心嵌素白和平圆盘。星历元年启用。
               </figcaption>
             </figure>
             <p>
-              旗面自左至右分作两色：左为绯红，右为星蓝，界线居中，象征联邦由两系文明合盟而立、其权均等。旗心为金色五角星，五星取五域同心之意；星心嵌素白圆环，环中画和平符号，昭示联邦以和平为立国之本，武力仅用于守土。
+              旗面自左至右分作两色：左为绯红，右为星蓝，界线居中，象征联邦由两系文明合盟而立、其权均等。旗心为金色五角星，五角取五域同心之意；星心嵌一枚素白圆盘，盘内以金色绘和平符号，符号外环即圆盘边缘，昭示联邦以和平为立国之本，武力仅用于守土。
             </p>
             <ul class="swatches">
               {swatches.map((item) => (
@@ -115,6 +122,26 @@ const swatches = [
                     <br />
                     {lang === 'zh' ? item.zh[1] : item.en[1]}
                   </span>
+                </li>
+              ))}
+            </ul>
+
+            <h2>{t('about.flags')}</h2>
+            <p>
+              国旗的制式向下延伸至五个州域：各域以本域主色替换旗地颜色，并把旗心的和平符号换成各自的纹章，其余构图、比例与留白完全一致。五域旗帜都是
+              604 × 340 的直角矩形，与国旗同制，可并列悬挂而不失统一。
+            </p>
+            <ul class="flag-grid">
+              {DOMAINS.map((domain) => (
+                <li>
+                  <a class="flag-card" href={url(`${lang}/domains/${domain.id}/`)}>
+                    <FlagMark class="flag-card__flag" domain={domain} decorative />
+                    <span class="flag-card__name">
+                      <span class="flag-card__order">{ordinal(domain.order)}</span>
+                      <span>{domain.name[lang]}</span>
+                    </span>
+                    <span class="flag-card__epithet">{domain.emblemName[lang]}</span>
+                  </a>
                 </li>
               ))}
             </ul>
@@ -181,22 +208,23 @@ const swatches = [
               <img
                 src={url(SITE.flag)}
                 alt="Flag of the PeaceStar Federation"
-                width="604"
-                height="340"
+                width="1208"
+                height="680"
                 loading="lazy"
               />
               <figcaption>
                 The flag of the PeaceStar Federation: two vertical bands with a golden five-pointed
-                star and a white ring of peace at its heart. Adopted in Stellar Year 1.
+                star, its heart set with a plain white disc of peace. Adopted in Stellar Year 1.
               </figcaption>
             </figure>
             <p>
               The field is divided into two equal bands — crimson at the hoist, star blue at the
               fly — signifying that the Federation was founded by the union of two civilisations
               of equal standing. At its centre stands a golden five-pointed star, the five points
-              read as five domains of one heart. Set within the star is a plain white ring bearing
-              a peace symbol, declaring that peace is the Federation's foundation and that force is
-              kept only for the defence of the realm.
+              read as five domains of one heart. Set at the star's heart is a plain white disc,
+              drawn with a peace symbol in gold whose outer ring is the disc's own edge, declaring
+              that peace is the Federation's foundation and that force is kept only for the defence
+              of the realm.
             </p>
             <ul class="swatches">
               {swatches.map((item) => (
@@ -209,6 +237,29 @@ const swatches = [
                     <br />
                     {lang === 'zh' ? item.zh[1] : item.en[1]}
                   </span>
+                </li>
+              ))}
+            </ul>
+
+            <h2>{t('about.flags')}</h2>
+            <p>
+              The same construction carries down to the five domains: each replaces the field
+              colours with its own and swaps the peace symbol at the star's heart for its own
+              emblem, while composition, proportions and margins stay identical. All five are drawn
+              to the same 604 × 340 rectangle with square corners, so a full set can be flown side
+              by side without losing its unity.
+            </p>
+            <ul class="flag-grid">
+              {DOMAINS.map((domain) => (
+                <li>
+                  <a class="flag-card" href={url(`${lang}/domains/${domain.id}/`)}>
+                    <FlagMark class="flag-card__flag" domain={domain} decorative />
+                    <span class="flag-card__name">
+                      <span class="flag-card__order">{ordinal(domain.order)}</span>
+                      <span>{domain.name[lang]}</span>
+                    </span>
+                    <span class="flag-card__epithet">{domain.emblemName[lang]}</span>
+                  </a>
                 </li>
               ))}
             </ul>

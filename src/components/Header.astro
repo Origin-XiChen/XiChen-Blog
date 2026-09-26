@@ -6,7 +6,7 @@ import FlagMark from './FlagMark.astro';
 interface Props {
   lang: Lang;
   langSwitchUrl: string;
-  current?: 'home' | 'about' | 'post';
+  current?: 'home' | 'about' | 'post' | 'domains';
 }
 
 const { lang, langSwitchUrl, current } = Astro.props;
@@ -17,7 +17,7 @@ const otherLang: Lang = lang === 'zh' ? 'en' : 'zh';
 <header class="site-header">
   <div class="container site-header__inner">
     <a class="brand" href={url(`${lang}/`)}>
-      <FlagMark class="brand__mark" title={t('site.title')} />
+      <FlagMark class="brand__mark" decorative />
       <span class="brand__text">
         <span class="brand__name">{t('site.title')}</span>
         <span class="brand__latin">{t('site.latinName')}</span>
@@ -26,12 +26,19 @@ const otherLang: Lang = lang === 'zh' ? 'en' : 'zh';
 
     <nav class="nav" aria-label="Navigation">
       <a href={url(`${lang}/`)} aria-current={current === 'home' ? 'page' : undefined}>
-        {t('nav.home')}
+        <span class="nav__text">{t('nav.home')}</span>
       </a>
-      <a href={url(`${lang}/#documents`)} class="nav__section">{t('nav.documents')}</a>
-      <a href={url(`${lang}/#techlogs`)} class="nav__section">{t('nav.techlogs')}</a>
+      <a href={url(`${lang}/#documents`)} class="nav__section">
+        <span class="nav__text">{t('nav.documents')}</span>
+      </a>
+      <a href={url(`${lang}/#techlogs`)} class="nav__section">
+        <span class="nav__text">{t('nav.techlogs')}</span>
+      </a>
+      <a href={url(`${lang}/domains/`)} aria-current={current === 'domains' ? 'page' : undefined}>
+        <span class="nav__text">{t('nav.domains')}</span>
+      </a>
       <a href={url(`${lang}/about/`)} aria-current={current === 'about' ? 'page' : undefined}>
-        {t('nav.about')}
+        <span class="nav__text">{t('nav.about')}</span>
       </a>
       <a
         class="icon-button"
@@ -98,31 +105,12 @@ const otherLang: Lang = lang === 'zh' ? 'en' : 'zh';
 </script>
 
 <style>
+  /* 馆徽即国旗：按旗幅比 604 : 340 出框，高度由宽度决定 */
   :global(.brand__mark) {
-    width: 32px;
-    height: 32px;
+    display: block;
+    width: 46px;
+    height: auto;
     flex-shrink: 0;
-  }
-
-  .brand__text {
-    display: flex;
-    flex-direction: column;
-    line-height: 1.15;
-  }
-
-  .brand__name {
-    font-weight: 700;
-    letter-spacing: 0.01em;
-    white-space: nowrap;
-  }
-
-  .brand__latin {
-    font-size: 0.7rem;
-    font-weight: 500;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    white-space: nowrap;
   }
 
   :root[data-theme='dark'] .icon--sun {
@@ -131,5 +119,11 @@ const otherLang: Lang = lang === 'zh' ? 'en' : 'zh';
 
   :root:not([data-theme='dark']) .icon--moon {
     display: none;
+  }
+
+  @media (max-width: 640px) {
+    :global(.brand__mark) {
+      width: 38px;
+    }
   }
 </style>

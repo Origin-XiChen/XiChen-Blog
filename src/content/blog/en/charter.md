@@ -52,7 +52,7 @@ The five domains of Xihe, Panxing, Canglan, Changfeng and Guiyuan, having endure
 
 ## Chapter V — Flag, Calendar and Records
 
-**Article 14.** The national flag is a vertical bicolour of crimson and star blue, bearing at its centre a golden five-pointed star with a plain white ring of peace set within it. The making and use of the flag are prescribed separately.
+**Article 14.** The national flag is a vertical bicolour of crimson and star blue, bearing at its centre a golden five-pointed star with a plain white disc of peace set at its heart. The making and use of the flag are prescribed separately.
 
 **Article 15.** The year of the Federation's founding is Stellar Year 1, and the whole realm reckons time by it. Domain calendars may be kept alongside it, but official documents shall use the stellar calendar.
 

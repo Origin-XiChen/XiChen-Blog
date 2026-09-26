@@ -1,0 +1,136 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import FlagMark from '../../../components/FlagMark.astro';
+import { langCodes, useTranslations, type Lang } from '../../../i18n/ui';
+import { url } from '../../../lib/url';
+import { DOMAINS, type Domain } from '../../../config';
+
+export function getStaticPaths() {
+  return langCodes.flatMap((lang) =>
+    DOMAINS.map((domain) => ({
+      params: { lang, id: domain.id },
+      props: { domain },
+    })),
+  );
+}
+
+const { domain } = Astro.props as { domain: Domain };
+const lang = Astro.params.lang as Lang;
+const t = useTranslations(lang);
+const other: Lang = lang === 'zh' ? 'en' : 'zh';
+
+/** 序次：中文用汉字，英文用罗马数字 */
+const ORDINALS = {
+  zh: ['一', '二', '三', '四', '五'],
+  en: ['I', 'II', 'III', 'IV', 'V'],
+} as const;
+const ordinal = (n: number) => ORDINALS[lang][n - 1] ?? String(n);
+
+const others = DOMAINS.filter((item) => item.id !== domain.id);
+
+const alternates = langCodes.map((code) => ({
+  lang: code,
+  href: new URL(url(`${code}/domains/${domain.id}/`), Astro.site ?? Astro.url.origin).href,
+}));
+const langSwitchUrl = url(`${other}/domains/${domain.id}/`);
+
+const community = {
+  zh: `第 ${ordinal(domain.order)} 域`,
+  en: `Domain ${ordinal(domain.order)}`,
+}[lang];
+---
+
+<BaseLayout
+  lang={lang}
+  title={`${domain.name[lang]} · ${t('domain.detailKicker')}`}
+  description={domain.blazon[lang]}
+  current="domains"
+  langSwitchUrl={langSwitchUrl}
+  alternates={alternates}
+>
+  <div class="container">
+    <a class="back-link" href={url(`${lang}/domains/`)}>← {t('domain.indexTitle')}</a>
+
+    <section class="domain-hero">
+      <div>
+        <p class="domain-hero__order">
+          {community}　·　{domain.latin}
+        </p>
+        <h1 class="domain-hero__name">{domain.name[lang]}</h1>
+        <p class="domain-hero__epithet">{domain.epithet[lang]}</p>
+        <p class="domain-hero__blazon">{domain.blazon[lang]}</p>
+      </div>
+
+      <figure class="flag-figure">
+        <FlagMark domain={domain} />
+        <figcaption>
+          {domain.emblemName[lang]}　·　<a href={url(`flags/${domain.id}.svg`)} download>
+            {t('flag.download')}
+          </a>
+        </figcaption>
+      </figure>
+    </section>
+
+    <dl class="facts">
+      <dt>{t('domain.capital')}</dt>
+      <dd>{domain.capital[lang]}</dd>
+
+      <dt>{t('domain.terrain')}</dt>
+      <dd>{domain.terrain[lang]}</dd>
+
+      <dt>{t('domain.industry')}</dt>
+      <dd>{domain.industry[lang]}</dd>
+
+      <dt>{t('domain.seats')}</dt>
+      <dd>{domain.seats}</dd>
+
+      <dt>{t('domain.emblem')}</dt>
+      <dd>{domain.emblemName[lang]}</dd>
+
+      <dt>{t('domain.colors')}</dt>
+      <dd>
+        <ul class="flag-strip">
+          {
+            domain.colors.map((color, index) => (
+              <li>
+                <span class="flag-strip__chip" style={`background:${color}`} />
+                {domain.colorNames[index][lang]} {color}
+              </li>
+            ))
+          }
+        </ul>
+      </dd>
+    </dl>
+
+    <section class="section-block" aria-labelledby="blazon-title">
+      <div class="section-block__head">
+        <h2 class="section-title" id="blazon-title"><span>{t('domain.blazonTitle')}</span></h2>
+      </div>
+      <div class="prose">
+        <p>{t('domain.flagNote')}</p>
+      </div>
+    </section>
+
+    <section class="section-block" aria-labelledby="others-title">
+      <div class="section-block__head">
+        <h2 class="section-title" id="others-title"><span>{t('domain.switch')}</span></h2>
+      </div>
+      <ul class="flag-grid">
+        {
+          others.map((item) => (
+            <li>
+              <a class="flag-card" href={url(`${lang}/domains/${item.id}/`)}>
+                <FlagMark class="flag-card__flag" domain={item} decorative />
+                <span class="flag-card__name">
+                  {item.name[lang]}
+                  <span class="flag-card__order">{ordinal(item.order)}</span>
+                </span>
+                <span class="flag-card__epithet">{item.epithet[lang]}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </div>
+</BaseLayout>

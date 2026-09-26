@@ -1,0 +1,62 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import FlagMark from '../../../components/FlagMark.astro';
+import { langCodes, useTranslations, type Lang } from '../../../i18n/ui';
+import { url } from '../../../lib/url';
+import { DOMAINS } from '../../../config';
+
+export function getStaticPaths() {
+  return langCodes.map((lang) => ({ params: { lang } }));
+}
+
+const lang = Astro.params.lang as Lang;
+const t = useTranslations(lang);
+const other: Lang = lang === 'zh' ? 'en' : 'zh';
+
+/** 序次：中文用汉字，英文用罗马数字 */
+const ORDINALS = {
+  zh: ['一', '二', '三', '四', '五'],
+  en: ['I', 'II', 'III', 'IV', 'V'],
+} as const;
+const ordinal = (n: number) => ORDINALS[lang][n - 1] ?? String(n);
+
+const alternates = langCodes.map((code) => ({
+  lang: code,
+  href: new URL(url(`${code}/domains/`), Astro.site ?? Astro.url.origin).href,
+}));
+const langSwitchUrl = url(`${other}/domains/`);
+---
+
+<BaseLayout
+  lang={lang}
+  title={t('domain.indexTitle')}
+  description={t('domain.indexDesc')}
+  current="domains"
+  langSwitchUrl={langSwitchUrl}
+  alternates={alternates}
+>
+  <div class="container">
+    <header class="page-header">
+      <p class="page-header__kicker">{t('domain.indexKicker')}</p>
+      <h1>{t('domain.indexTitle')}</h1>
+      <p>{t('domain.indexDesc')}</p>
+    </header>
+
+    <ul class="domain-index">
+      {
+        DOMAINS.map((domain) => (
+          <li>
+            <a class="domain-index__item" href={url(`${lang}/domains/${domain.id}/`)}>
+              <span class="domain-index__order">{ordinal(domain.order)}</span>
+              <span class="domain-index__text">
+                <span class="domain-index__name">{domain.name[lang]}</span>
+                <span class="domain-index__epithet">{domain.epithet[lang]}</span>
+              </span>
+              <FlagMark class="domain-index__flag" domain={domain} decorative />
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</BaseLayout>

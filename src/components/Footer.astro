@@ -13,7 +13,8 @@ const year = new Date().getFullYear();
 
 <footer class="site-footer">
   <div class="container site-footer__inner">
-    <span>© {year} {SITE.author} · {t('footer.builtWith')}</span>
+    <span class="site-footer__org">{SITE.author}　·　© {year}</span>
+    <span>{t('footer.builtWith')}</span>
     <span class="site-footer__disclaimer">{t('footer.disclaimer')}</span>
   </div>
 </footer>

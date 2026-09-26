@@ -1,10 +1,11 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PostCard from '../../components/PostCard.astro';
+import FlagMark from '../../components/FlagMark.astro';
 import { langCodes, useTranslations, type Lang } from '../../i18n/ui';
 import { getDocuments, getTechLogs } from '../../lib/posts';
 import { url } from '../../lib/url';
-import { SITE } from '../../config';
+import { DOMAINS, SITE } from '../../config';
 
 export function getStaticPaths() {
   return langCodes.map((lang) => ({ params: { lang } }));
@@ -15,6 +16,13 @@ const t = useTranslations(lang);
 const documents = await getDocuments(lang);
 const techlogs = await getTechLogs(lang);
 
+/** 序次：中文用汉字，英文用罗马数字 */
+const ORDINALS = {
+  zh: ['一', '二', '三', '四', '五'],
+  en: ['I', 'II', 'III', 'IV', 'V'],
+} as const;
+const ordinal = (n: number) => ORDINALS[lang][n - 1] ?? String(n);
+
 const other: Lang = lang === 'zh' ? 'en' : 'zh';
 const alternates = langCodes.map((code) => ({
   lang: code,
@@ -22,6 +30,12 @@ const alternates = langCodes.map((code) => ({
 }));
 
 const langSwitchUrl = url(`${other}/`);
+
+const COPY = {
+  zh: { org: '和星联邦', flagCaption: '联邦国旗　制式 604 × 340' },
+  en: { org: 'PEACESTAR FEDERATION', flagCaption: 'National Flag　604 × 340' },
+} as const;
+const c = COPY[lang];
 ---
 
 <BaseLayout
@@ -33,41 +47,47 @@ const langSwitchUrl = url(`${other}/`);
 >
   <div class="container">
     <section class="masthead">
-      <img
-        class="masthead__flag"
-        src={url(SITE.flag)}
-        alt={lang === 'zh' ? '和星联邦国旗' : 'Flag of the PeaceStar Federation'}
-        width="604"
-        height="340"
-        loading="eager"
-      />
-      <div>
-        <p class="masthead__eyebrow">{SITE.latinName}</p>
-        <h1>{SITE.title}</h1>
+      <div class="masthead__lede">
+        <p class="masthead__org">{c.org}</p>
+        <h1 class="masthead__title">{SITE.title}</h1>
+        <p class="masthead__latin">{SITE.latinName}</p>
+        <div class="masthead__rule" aria-hidden="true"><span></span><span></span></div>
         <p class="masthead__motto">{t('site.motto')}</p>
         <p class="masthead__desc">{t('site.description')}</p>
       </div>
+
+      <div class="masthead__aside">
+        <FlagMark class="masthead__flag" />
+        <p class="masthead__caption">{c.flagCaption}</p>
+      </div>
     </section>
 
-    <ul class="stats">
+    <ul class="bulletin">
       <li>
-        <span class="stats__value">{documents.length}</span>
-        <span class="stats__label">{t('home.stats.docs')}</span>
+        <span class="bulletin__value">{documents.length}</span>
+        <span class="bulletin__label">{t('home.stats.docs')}</span>
       </li>
       <li>
-        <span class="stats__value">{techlogs.length}</span>
-        <span class="stats__label">{t('home.stats.techlogs')}</span>
+        <span class="bulletin__value">{techlogs.length}</span>
+        <span class="bulletin__label">{t('home.stats.techlogs')}</span>
       </li>
       <li>
-        <span class="stats__value">I</span>
-        <span class="stats__label">{t('home.stats.since')}</span>
+        <span class="bulletin__value">{DOMAINS.length}</span>
+        <span class="bulletin__label">{t('home.stats.domains')}</span>
+      </li>
+      <li>
+        <span class="bulletin__value">I</span>
+        <span class="bulletin__label">{t('home.stats.since')}</span>
       </li>
     </ul>
 
     <section class="section-block" id="documents" aria-labelledby="documents-title">
       <div class="section-block__head">
-        <h2 class="section-title" id="documents-title">{t('home.documents')}</h2>
-        <p class="section-block__hint">{t('home.documentsHint')}</p>
+        <h2 class="section-title" id="documents-title"><span>{t('home.documents')}</span></h2>
+        <p class="section-block__hint">
+          <span>{t('home.documentsHint')}</span>
+          <span class="section-block__count">{documents.length}</span>
+        </p>
       </div>
       {
         documents.length > 0 ? (
@@ -82,10 +102,39 @@ const langSwitchUrl = url(`${other}/`);
       }
     </section>
 
+    <section class="section-block" id="domains" aria-labelledby="domains-title">
+      <div class="section-block__head">
+        <h2 class="section-title" id="domains-title"><span>{t('home.domains')}</span></h2>
+        <p class="section-block__hint">
+          <span>{t('home.domainsHint')}</span>
+          <a class="section-block__count" href={url(`${lang}/domains/`)}>{t('home.domainsAll')} →</a>
+        </p>
+      </div>
+      <ul class="flag-grid">
+        {
+          DOMAINS.map((domain) => (
+            <li>
+              <a class="flag-card" href={url(`${lang}/domains/${domain.id}/`)}>
+                <FlagMark class="flag-card__flag" domain={domain} decorative />
+                <span class="flag-card__name">
+                  {domain.name[lang]}
+                  <span class="flag-card__order">{ordinal(domain.order)}</span>
+                </span>
+                <span class="flag-card__epithet">{domain.epithet[lang]}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
     <section class="section-block" id="techlogs" aria-labelledby="techlogs-title">
       <div class="section-block__head">
-        <h2 class="section-title" id="techlogs-title">{t('home.techlogs')}</h2>
-        <p class="section-block__hint">{t('home.techlogsHint')}</p>
+        <h2 class="section-title" id="techlogs-title"><span>{t('home.techlogs')}</span></h2>
+        <p class="section-block__hint">
+          <span>{t('home.techlogsHint')}</span>
+          <span class="section-block__count">{techlogs.length}</span>
+        </p>
       </div>
       {
         techlogs.length > 0 ? (
