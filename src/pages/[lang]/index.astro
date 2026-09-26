@@ -6,6 +6,7 @@ import { langCodes, useTranslations, type Lang } from '../../i18n/ui';
 import { getDocuments, getTechLogs } from '../../lib/posts';
 import { url } from '../../lib/url';
 import { DOMAINS, SITE } from '../../config';
+import { OWNER, PROPERTIES } from '../../lib/properties';
 
 export function getStaticPaths() {
   return langCodes.map((lang) => ({ params: { lang } }));
@@ -121,6 +122,30 @@ const c = COPY[lang];
                   <span class="flag-card__order">{ordinal(domain.order)}</span>
                 </span>
                 <span class="flag-card__epithet">{domain.epithet[lang]}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="section-block" id="properties" aria-labelledby="properties-title">
+      <div class="section-block__head">
+        <h2 class="section-title" id="properties-title"><span>{t('home.properties')}</span></h2>
+        <p class="section-block__hint">
+          <span>{t('home.propertiesHint')}</span>
+          <a class="section-block__count" href={url(`${lang}/properties/`)}>{t('home.propertiesAll')} →</a>
+        </p>
+      </div>
+      <ul class="prop-grid">
+        {
+          PROPERTIES.map((property) => (
+            <li>
+              <a class="prop-card" href={url(`${lang}/properties/${property.id}/`)}>
+                <span class="prop-card__version">{property.version}</span>
+                <span class="prop-card__name">{property.name}</span>
+                <span class="prop-card__tagline">{property.tagline[lang]}</span>
+                <span class="prop-card__repo">{OWNER}/{property.repo}</span>
               </a>
             </li>
           ))

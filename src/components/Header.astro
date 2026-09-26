@@ -6,7 +6,7 @@ import FlagMark from './FlagMark.astro';
 interface Props {
   lang: Lang;
   langSwitchUrl: string;
-  current?: 'home' | 'about' | 'post' | 'domains';
+  current?: 'home' | 'about' | 'post' | 'domains' | 'properties';
 }
 
 const { lang, langSwitchUrl, current } = Astro.props;
@@ -36,6 +36,12 @@ const otherLang: Lang = lang === 'zh' ? 'en' : 'zh';
       </a>
       <a href={url(`${lang}/domains/`)} aria-current={current === 'domains' ? 'page' : undefined}>
         <span class="nav__text">{t('nav.domains')}</span>
+      </a>
+      <a
+        href={url(`${lang}/properties/`)}
+        aria-current={current === 'properties' ? 'page' : undefined}
+      >
+        <span class="nav__text">{t('nav.properties')}</span>
       </a>
       <a href={url(`${lang}/about/`)} aria-current={current === 'about' ? 'page' : undefined}>
         <span class="nav__text">{t('nav.about')}</span>

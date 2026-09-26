@@ -1,0 +1,302 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { langCodes, useTranslations, type Lang } from '../../../i18n/ui';
+import { url } from '../../../lib/url';
+import {
+  OWNER,
+  PROPERTIES,
+  formatBytes,
+  releasesUrl,
+  repoUrl,
+} from '../../../lib/properties';
+
+export function getStaticPaths() {
+  return langCodes.map((lang) => ({ params: { lang } }));
+}
+
+const lang = Astro.params.lang as Lang;
+const t = useTranslations(lang);
+const other: Lang = lang === 'zh' ? 'en' : 'zh';
+
+/** 序次：中文用汉字，英文用罗马数字 */
+const ORDINALS = {
+  zh: ['一', '二', '三', '四', '五'],
+  en: ['I', 'II', 'III', 'IV', 'V'],
+} as const;
+const ordinal = (n: number) => ORDINALS[lang][n - 1] ?? String(n);
+
+const alternates = langCodes.map((code) => ({
+  lang: code,
+  href: new URL(url(`${code}/properties/`), Astro.site ?? Astro.url.origin).href,
+}));
+const langSwitchUrl = url(`${other}/properties/`);
+---
+
+<BaseLayout
+  lang={lang}
+  title={t('prop.indexTitle')}
+  description={t('prop.indexDesc')}
+  current="properties"
+  langSwitchUrl={langSwitchUrl}
+  alternates={alternates}
+>
+  <div class="container">
+    <header class="page-header">
+      <p class="page-header__kicker">{t('prop.indexKicker')}</p>
+      <h1>{t('prop.indexTitle')}</h1>
+      <p>{t('prop.indexDesc')}</p>
+    </header>
+
+    <ul class="property-index">
+      {
+        PROPERTIES.map((property) => (
+          <li class="property-index__item">
+            <div class="property-index__head">
+              <span class="property-index__order">{ordinal(property.order)}</span>
+              <div class="property-index__title">
+                <h2>
+                  <a href={url(`${lang}/properties/${property.id}/`)}>{property.name}</a>
+                </h2>
+                <p class="property-index__tagline">{property.tagline[lang]}</p>
+                <p class="property-index__repo">
+                  <span class="property-index__owner">{OWNER}/</span>
+                  <span class="property-index__name">{property.repo}</span>
+                </p>
+              </div>
+              <div class="property-index__version">
+                <span class="property-index__version-tag">{property.version}</span>
+                <span class="property-index__version-date">{property.releasedAt}</span>
+              </div>
+            </div>
+
+            <ul class="property-index__stack">
+              {property.stack.map((item) => (
+                <li>{item}</li>
+              ))}
+            </ul>
+
+            <ul class="property-index__files">
+              {property.assets.map((asset) => (
+                <li>
+                  <a
+                    class="property-index__dl"
+                    href={url(`${lang}/properties/${property.id}/#downloads`)}
+                    rel="nofollow"
+                  >
+                    <span class="property-index__dl-file">{asset.file}</span>
+                    <span class="property-index__dl-size">{formatBytes(asset.bytes)}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+
+            <p class="property-index__links">
+              <a href={repoUrl(property)} rel="noopener">GitHub</a>
+              <span aria-hidden="true">·</span>
+              <a href={releasesUrl(property)} rel="noopener">{t('prop.releasesLink')}</a>
+              <span aria-hidden="true">·</span>
+              <a href={url(`${lang}/blog/${property.logSlug}/`)}>{t('prop.logLink')}</a>
+            </p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</BaseLayout>
+
+<style>
+  .property-index {
+    list-style: none;
+    margin: 0 0 4rem;
+    padding: 0;
+    border-top: 1px solid var(--rule);
+  }
+
+  .property-index__item {
+    padding: 2rem 0 2.25rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .property-index__head {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.25rem;
+  }
+
+  .property-index__order {
+    flex-shrink: 0;
+    width: 2rem;
+    font-family: var(--font-serif);
+    font-size: 1.05rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  .property-index__title {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .property-index__title h2 {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  .property-index__title h2 a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .property-index__title h2 a:hover {
+    color: var(--accent);
+  }
+
+  .property-index__tagline {
+    margin: 0.4rem 0 0;
+    max-width: 44rem;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.75;
+  }
+
+  .property-index__repo {
+    margin: 0.6rem 0 0;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.02em;
+    color: var(--text-muted);
+  }
+
+  .property-index__owner {
+    opacity: 0.72;
+  }
+
+  .property-index__version {
+    flex-shrink: 0;
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .property-index__version-tag {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.04em;
+  }
+
+  .property-index__version-date {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text-muted);
+  }
+
+  .property-index__stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 0.75rem;
+    list-style: none;
+    margin: 1.1rem 0 0;
+    padding: 0 0 0 3.25rem;
+    font-size: 0.74rem;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+  }
+
+  .property-index__stack li {
+    position: relative;
+    padding-left: 0.75rem;
+  }
+
+  .property-index__stack li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.55em;
+    width: 3px;
+    height: 3px;
+    background: var(--border-strong);
+  }
+
+  .property-index__files {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem 1.5rem;
+    list-style: none;
+    margin: 1.1rem 0 0;
+    padding: 0 0 0 3.25rem;
+  }
+
+  .property-index__dl {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    padding: 0.35rem 0;
+    border-bottom: 1px solid var(--rule);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .property-index__dl:hover {
+    border-bottom-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .property-index__dl-size {
+    color: var(--text-muted);
+    font-size: 0.74rem;
+  }
+
+  .property-index__links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 1.25rem 0 0;
+    padding-left: 3.25rem;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+  }
+
+  .property-index__links a {
+    color: var(--text-muted);
+    text-decoration: none;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .property-index__links a:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  @media (max-width: 640px) {
+    .property-index__head {
+      flex-wrap: wrap;
+    }
+
+    .property-index__order {
+      width: 1.5rem;
+    }
+
+    .property-index__version {
+      width: 100%;
+      text-align: left;
+      flex-direction: row;
+      gap: 0.75rem;
+      padding-left: 2.75rem;
+    }
+
+    .property-index__stack,
+    .property-index__files,
+    .property-index__links {
+      padding-left: 2.75rem;
+    }
+  }
+</style>

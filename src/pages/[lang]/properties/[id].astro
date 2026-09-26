@@ -1,0 +1,459 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { langCodes, useTranslations, type Lang } from '../../../i18n/ui';
+import { url } from '../../../lib/url';
+import {
+  OWNER,
+  PROPERTIES,
+  badge,
+  downloadUrl,
+  formatBytes,
+  releaseTagUrl,
+  releasesUrl,
+  repoUrl,
+} from '../../../lib/properties';
+
+export function getStaticPaths() {
+  return langCodes.flatMap((lang) =>
+    PROPERTIES.map((property) => ({ params: { lang, id: property.id }, props: { property } })),
+  );
+}
+
+const { property } = Astro.props as { property: (typeof PROPERTIES)[number] };
+const lang = Astro.params.lang as Lang;
+const t = useTranslations(lang);
+const other: Lang = lang === 'zh' ? 'en' : 'zh';
+
+const ORDINALS = {
+  zh: ['一', '二', '三', '四', '五'],
+  en: ['I', 'II', 'III', 'IV', 'V'],
+} as const;
+const ordinal = (n: number) => ORDINALS[lang][n - 1] ?? String(n);
+
+const alternates = langCodes.map((code) => ({
+  lang: code,
+  href: new URL(url(`${code}/properties/${property.id}/`), Astro.site ?? Astro.url.origin).href,
+}));
+const langSwitchUrl = url(`${other}/properties/${property.id}/`);
+
+const siblings = PROPERTIES.filter((item) => item.id !== property.id);
+
+const facts = [
+  { label: t('prop.order'), value: ordinal(property.order) },
+  { label: t('prop.version'), value: property.version },
+  { label: t('prop.releasedAt'), value: property.releasedAt },
+  { label: t('prop.license'), value: property.license },
+  { label: t('prop.platform'), value: property.platform[lang] },
+  { label: t('prop.repo'), value: `${OWNER}/${property.repo}`, href: repoUrl(property) },
+];
+
+const licenseNote = property.license.startsWith('GPL') ? t('prop.gplNote') : t('prop.mitNote');
+---
+
+<BaseLayout
+  lang={lang}
+  title={`${property.name} · ${property.version}`}
+  description={property.tagline[lang]}
+  current="properties"
+  langSwitchUrl={langSwitchUrl}
+  alternates={alternates}
+>
+  <div class="container container--narrow">
+    <a class="back-link" href={url(`${lang}/properties/`)}>
+      ← {t('prop.indexTitle')}
+    </a>
+
+    <article class="property">
+      <header class="property__header">
+        <p class="page-header__kicker">{t('prop.detailKicker')}</p>
+        <h1 class="property__name">{property.name}</h1>
+        <p class="property__tagline">{property.tagline[lang]}</p>
+        <p class="property__badges">
+          <img src={badge(property, 'release')} alt={`release ${property.version}`} height="20" />
+          <img src={badge(property, 'license')} alt={property.license} height="20" />
+          <img src={badge(property, 'stars')} alt="stars" height="20" />
+        </p>
+      </header>
+
+      <dl class="factsheet">
+        {
+          facts.map((fact) => (
+            <div class="factsheet__row">
+              <dt>{fact.label}</dt>
+              <dd>
+                {fact.href ? (
+                  <a href={fact.href} rel="noopener">
+                    {fact.value}
+                  </a>
+                ) : (
+                  fact.value
+                )}
+              </dd>
+            </div>
+          ))
+        }
+      </dl>
+
+      <section class="property__section">
+        <h2 class="property__h2">{t('prop.highlights')}</h2>
+        <ul class="highlights">
+          {
+            property.highlights.map((item) => (
+              <li class="highlights__item">{item[lang]}</li>
+            ))
+          }
+        </ul>
+      </section>
+
+      <section class="property__section" id="downloads">
+        <h2 class="property__h2">{t('prop.downloads')}</h2>
+        <p class="property__note">{t('prop.latestNote')}</p>
+
+        <ul class="downloads">
+          {
+            property.assets.map((asset) => (
+              <li class="downloads__item">
+                <a
+                  class="download-button"
+                  href={downloadUrl(property, asset)}
+                  rel="noopener"
+                  download
+                >
+                  <span class="download-button__label">{t('prop.download')}</span>
+                  <span class="download-button__file">{asset.file}</span>
+                </a>
+                <div class="downloads__meta">
+                  <p class="downloads__note">{asset.note[lang]}</p>
+                  <p class="downloads__url">{downloadUrl(property, asset)}</p>
+                  <p class="downloads__size">
+                    {t('prop.fileSize')} · {formatBytes(asset.bytes)}
+                  </p>
+                </div>
+              </li>
+            ))
+          }
+        </ul>
+
+        <p class="property__links">
+          <a href={repoUrl(property)} rel="noopener">{t('prop.repoLink')}</a>
+          <span aria-hidden="true">·</span>
+          <a href={releasesUrl(property)} rel="noopener">{t('prop.releasesLink')}</a>
+          <span aria-hidden="true">·</span>
+          <a href={releaseTagUrl(property)} rel="noopener">{property.version}</a>
+          <span aria-hidden="true">·</span>
+          <a href={url(`${lang}/blog/${property.logSlug}/`)}>{t('prop.logLink')}</a>
+        </p>
+
+        <p class="property__license">{licenseNote}</p>
+      </section>
+
+      {
+        siblings.length > 0 && (
+          <nav class="property__switch" aria-label={t('prop.indexTitle')}>
+            <span class="property__switch-title">{t('prop.indexTitle')}</span>
+            <ul>
+              {siblings.map((item) => (
+                <li>
+                  <a href={url(`${lang}/properties/${item.id}/`)}>
+                    <span class="property__switch-name">{item.name}</span>
+                    <span class="property__switch-tagline">{item.tagline[lang]}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )
+      }
+    </article>
+  </div>
+</BaseLayout>
+
+<style>
+  .property__header {
+    padding-bottom: 1.75rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .property__name {
+    margin: 0.35rem 0 0;
+    font-family: var(--font-serif);
+    font-size: clamp(1.9rem, 5vw, 2.6rem);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  .property__tagline {
+    margin: 0.85rem 0 0;
+    max-width: 46rem;
+    color: var(--text-muted);
+    font-size: 1rem;
+    line-height: 1.8;
+  }
+
+  .property__badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 1.15rem 0 0;
+  }
+
+  .property__badges img {
+    height: 20px;
+    width: auto;
+  }
+
+  .factsheet {
+    margin: 0;
+    padding: 1.5rem 0 0;
+  }
+
+  .factsheet__row {
+    display: flex;
+    gap: 1.5rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .factsheet__row dt {
+    flex: 0 0 8rem;
+    font-size: 0.82rem;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+  }
+
+  .factsheet__row dd {
+    flex: 1 1 auto;
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: var(--text);
+    word-break: break-word;
+  }
+
+  .factsheet__row dd a {
+    color: var(--text);
+    text-decoration: none;
+    border-bottom: 1px solid var(--border-strong);
+  }
+
+  .factsheet__row dd a:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  .property__section {
+    margin-top: 2.75rem;
+  }
+
+  .property__h2 {
+    margin: 0 0 1.1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--rule);
+    font-family: var(--font-serif);
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+
+  .highlights {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .highlights__item {
+    position: relative;
+    padding: 0.5rem 0 0.5rem 1.4rem;
+    font-size: 0.95rem;
+    line-height: 1.85;
+    color: var(--text-muted);
+  }
+
+  .highlights__item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 1.28em;
+    width: 6px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  .property__note {
+    margin: -0.35rem 0 1.5rem;
+    font-size: 0.86rem;
+    line-height: 1.8;
+    color: var(--text-muted);
+  }
+
+  .downloads {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .downloads__item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.25rem;
+    padding: 1.1rem 1.25rem;
+    border: 1px solid var(--rule);
+  }
+
+  .download-button {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.6rem 1.4rem;
+    background: var(--accent);
+    color: #fff;
+    text-decoration: none;
+    transition: background 0.15s ease;
+  }
+
+  .download-button:hover {
+    background: var(--accent);
+    filter: brightness(1.12);
+  }
+
+  .download-button__label {
+    font-family: var(--font-serif);
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+  }
+
+  .download-button__file {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    opacity: 0.85;
+  }
+
+  .downloads__meta {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .downloads__note {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--text);
+  }
+
+  .downloads__url {
+    margin: 0.45rem 0 0;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    line-height: 1.6;
+    color: var(--text-muted);
+    word-break: break-all;
+  }
+
+  .downloads__size {
+    margin: 0.35rem 0 0;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text-muted);
+  }
+
+  .property__links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.55rem;
+    margin: 1.75rem 0 0;
+    font-size: 0.84rem;
+    color: var(--text-muted);
+  }
+
+  .property__links a {
+    color: var(--text-muted);
+    text-decoration: none;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .property__links a:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  .property__license {
+    margin: 0.85rem 0 0;
+    font-size: 0.8rem;
+    line-height: 1.8;
+    color: var(--text-muted);
+  }
+
+  .property__switch {
+    margin-top: 3.5rem;
+    padding-top: 1.5rem;
+    border-top: 3px solid var(--accent);
+  }
+
+  .property__switch-title {
+    display: block;
+    font-size: 0.8rem;
+    letter-spacing: 0.14em;
+    color: var(--text-muted);
+    margin-bottom: 0.9rem;
+  }
+
+  .property__switch ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .property__switch li + li {
+    border-top: 1px solid var(--rule);
+  }
+
+  .property__switch a {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 0.85rem 0;
+    text-decoration: none;
+  }
+
+  .property__switch-name {
+    font-family: var(--font-serif);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .property__switch a:hover .property__switch-name {
+    color: var(--accent);
+  }
+
+  .property__switch-tagline {
+    font-size: 0.84rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  @media (max-width: 640px) {
+    .factsheet__row {
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .factsheet__row dt {
+      flex: none;
+    }
+
+    .downloads__item {
+      flex-direction: column;
+      gap: 0.9rem;
+    }
+
+    .download-button {
+      align-items: center;
+    }
+  }
+</style>
