@@ -68,6 +68,8 @@ POST /eportal/InterFace.do?method=login
 https://github.com/Origin-XiChen/campus-net-auth/releases/latest/download/CampusNetAuth.exe
 ```
 
+项目以 GPL-3.0 授权发布，定位是个人学习与技术研究。
+
 ## 小结
 
 这个项目的体量不大，但把三件容易被忽略的事做完了：把协议读准、把响应做成事件驱动、把凭据交给系统保管。当前版本 V0.5.1，从 V0.1 起共六个发行版，全部可查。

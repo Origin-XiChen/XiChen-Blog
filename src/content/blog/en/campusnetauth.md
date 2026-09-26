@@ -68,6 +68,8 @@ The build artifact is hosted on GitHub. The address points at the latest Release
 https://github.com/Origin-XiChen/campus-net-auth/releases/latest/download/CampusNetAuth.exe
 ```
 
+The project is released under GPL-3.0 and positioned for personal study and technical research.
+
 ## Wrapping up
 
 The project is not large, but it finishes three things that are easy to skip: read the protocol correctly, make the response event-driven, and hand the credential to the operating system. The current version is V0.5.1; six releases have been published since V0.1, all of them on record.

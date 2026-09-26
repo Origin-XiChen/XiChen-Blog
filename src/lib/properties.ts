@@ -70,7 +70,7 @@ export const PROPERTIES: readonly Property[] = [
     },
     version: 'V0.5.1',
     releasedAt: '2026-09-25',
-    license: 'MIT',
+    license: 'GPL-3.0',
     platform: {
       zh: 'Windows 10 / 11 x64（需 WebView2 运行时）',
       en: 'Windows 10 / 11 x64 (requires the WebView2 runtime)',
